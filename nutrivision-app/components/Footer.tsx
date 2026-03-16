@@ -24,7 +24,7 @@ export default function Footer() {
                 </div>
 
                 {/* Navigation Links */}
-                <div className="flex justify-center items-center gap-4 md:gap-20 pb-6 border-b border-gray-600 overflow-x-auto">
+                <div className="flex justify-center items-center gap-4 md:gap-20 pb-6 border-b border-lime-300 overflow-x-auto">
                     <a href="#beranda" className="text-white text-sm md:text-lg font-regular hover:text-lime-300 transition whitespace-nowrap">
                         Beranda
                     </a>
@@ -40,10 +40,10 @@ export default function Footer() {
                 </div>
 
                 {/* Team Members Section */}
-                <div className="w-full bg-[#234338] rounded-lg outline outline-1 outline-gray-700 px-3 md:px-4 py-3.5 flex flex-col md:flex-row justify-center md:justify-between items-center gap-3 md:gap-4 overflow-x-auto">
+                <div className="w-full bg-[#234338] rounded-lg outline outline-1 outline-[#2C5446] px-3 md:px-4 py-3.5 flex flex-col md:flex-row justify-center md:justify-between items-center gap-3 md:gap-4 overflow-x-auto">
                     <div className="flex flex-row justify-center md:justify-start items-center gap-2 md:gap-4 flex-wrap md:flex-nowrap">
                         {teamMembers.map((member, index) => (
-                            <div key={index} className="flex items-center gap-2 p-2 md:p-3 rounded outline outline-1 outline-gray-700 flex-shrink-0">
+                            <div key={index} className="flex items-center gap-2 p-2 md:p-3 rounded outline outline-1 outline-[#2C5446] flex-shrink-0">
                                 <div className="flex-shrink-0 w-4 h-4 md:w-5 md:h-5 bg-lime-300 rounded"></div>
                                 <div className="flex-1 min-w-0">
                                     <div className="text-white text-xs md:text-sm font-medium leading-4 md:leading-5 truncate">{member.name}</div>
