@@ -1,9 +1,10 @@
 import Image from "next/image";
+import Footer from "@/components/Footer";
 
 export default function Home() {
     return (
         <div className="min-h-screen bg-background font-sans">
-            <main className="mx-auto grid w-full max-w-7xl items-center  px-8  grid-cols-2 gap-10 py-14">
+            <main id="beranda" className="mx-auto grid w-full max-w-7xl items-center  px-8  grid-cols-2 gap-10 py-14">
                 <section className="max-w-xl text-left">
                     <p className="inline-block border-b-3 border-[#cbea7b] pb-2 font-bold text-foreground text-2xl">
                         Wujudkan Hidup Lebih Sehat dengan
@@ -51,7 +52,7 @@ export default function Home() {
                     />
                 </section>
             </main>
-            <div className="mx-auto w-full max-w-6xl px-8 py-14 text-[#1a3129] flex flex-col items-center gap-8">
+            <div id="tentang" className="mx-auto w-full max-w-6xl px-8 py-14 text-[#1a3129] flex flex-col items-center gap-8">
                 <h1 className="text-5xl font-bold">Tentang <span className="font-extrabold">NutriVision</span></h1>
                 <p className="text-center text-xl leading-8">
                     NutriVision adalah platform analisis gizi berbasis AI yang
@@ -62,6 +63,7 @@ export default function Home() {
                     menghitung NutriScore secara otomatis.
                 </p>
             </div>
+            <Footer />
         </div>
     );
 }
