@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Footer from "@/components/Footer";
+import {Camera, Sparkles, Apple, Cloud, FileText, ArrowUpFromLine } from "lucide-react";
 
 export default function Home() {
     return (
@@ -76,9 +77,7 @@ export default function Home() {
                     <div className="p-6 md:p-8 lg:p-10 bg-lime-50 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-lime-100 flex flex-col gap-5">
                         <div className="flex items-center gap-2.5">
                             <div className="p-3 bg-[#cbea7b] rounded-md flex-shrink-0">
-                                <svg className="w-6 h-6 text-[#1a3129]" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-                                </svg>
+                                <Camera className="w-6 h-6 text-[#1a3129]" viewBox="0 0 24 24"></Camera>
                             </div>
                             <h3 className="text-lg md:text-xl font-semibold text-neutral-800">Ambil Foto Nutrition Facts</h3>
                         </div>
@@ -91,9 +90,7 @@ export default function Home() {
                     <div className="p-6 md:p-8 lg:p-10 bg-lime-50 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-lime-100 flex flex-col gap-5">
                         <div className="flex items-center gap-2.5">
                             <div className="p-3 bg-[#cbea7b] rounded-md flex-shrink-0">
-                                <svg className="w-6 h-6 text-[#1a3129]" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                                </svg>
+                                <Sparkles className="w-6 h-6 text-[#1a3129]" viewBox="0 0 24 24"></Sparkles>
                             </div>
                             <h3 className="text-lg md:text-xl font-semibold text-neutral-800">AI Membaca & Mengekstrak Data</h3>
                         </div>
@@ -106,9 +103,7 @@ export default function Home() {
                     <div className="p-6 md:p-8 lg:p-10 bg-lime-50 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-lime-100 flex flex-col gap-5">
                         <div className="flex items-center gap-2.5">
                             <div className="p-3 bg-[#cbea7b] rounded-md flex-shrink-0">
-                                <svg className="w-6 h-6 text-[#1a3129]" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-                                </svg>
+                                <Apple className="w-6 h-6 text-[#1a3129]" viewBox="0 0 24 24"></Apple>
                             </div>
                             <h3 className="text-lg md:text-xl font-semibold text-neutral-800">Dapatkan Nutri-Score Instan</h3>
                         </div>
@@ -131,9 +126,7 @@ export default function Home() {
                     <div className="p-6 md:p-8 lg:p-10 bg-lime-50 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-lime-100 flex flex-col gap-5">
                         <div className="flex items-center gap-2.5">
                             <div className="p-3 bg-[#cbea7b] rounded-md flex-shrink-0">
-                                <svg className="w-6 h-6 text-[#1a3129]" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-                                </svg>
+                               <Sparkles className="w-6 h-6 text-[#1a3129]" viewBox="0 0 24 24"></Sparkles>
                             </div>
                             <h3 className="text-lg md:text-xl font-semibold text-neutral-800">AI Nutrition Extraction</h3>
                         </div>
@@ -146,9 +139,7 @@ export default function Home() {
                     <div className="p-6 md:p-8 lg:p-10 bg-lime-50 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-lime-100 flex flex-col gap-5">
                         <div className="flex items-center gap-2.5">
                             <div className="p-3 bg-[#cbea7b] rounded-md flex-shrink-0">
-                                <svg className="w-6 h-6 text-[#1a3129]" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-                                </svg>
+                                <FileText className="w-6 h-6 text-[#1a3129]" viewBox="0 0 24 24"></FileText>
                             </div>
                             <h3 className="text-lg md:text-xl font-semibold text-neutral-800">Insight Nutrisi Jelas</h3>
                         </div>
@@ -161,9 +152,7 @@ export default function Home() {
                     <div className="p-6 md:p-8 lg:p-10 bg-lime-50 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-lime-100 flex flex-col gap-5">
                         <div className="flex items-center gap-2.5">
                             <div className="p-3 bg-[#cbea7b] rounded-md flex-shrink-0">
-                                <svg className="w-6 h-6 text-[#1a3129]" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                                </svg>
+                                <Cloud className="w-6 h-6 text-[#1a3129]" viewBox="0 0 24 24"></Cloud>
                             </div>
                             <h3 className="text-lg md:text-xl font-semibold text-neutral-800">Cloud Processing</h3>
                         </div>
@@ -173,7 +162,37 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-        <Footer />
+
+            <div className="relative  bg-[#EDFFDE] w-full h-200 max-w-screen py-[20px] text-[#1a3129] flex flex-col items-center justify-center gap-16 z-0">
+                <div className="flex flex-col items-center gap-4">
+                    <h2 className="inline-block border-b-3 border-[#cbea7b] text-6xl sm:mt-4 text-4xl sm:text-5xl md:text-6xl font-bold">Mulai Scan Sekarang!</h2>
+                    <p className=" pb-2 text-base sm:text-lg md:text-xl text-center text-[#262626]">Unggah label Nutrition Facts dan mulai analisis gizi dalam hitungan detik</p>
+                </div>
+                <div className="relative flex items-center justify-center px-4">
+                    <div className="p-6 bg-[#FAFDF2] w-full max-w-[713px] h-[365px] rounded-[32px] shadow-sm flex items-center justify-center">
+                        <div className="flex items-center justify-center bg-[#FAFDF2] rounded-[16px] border-2 border-dotted border-[#1A3129] w-[661px] h-[325px] rounded-16 flex-shrink-0">
+                            <div className=" grid grid-rows-3 justify-items-center items-center gap-y-[10px]">
+                                <ArrowUpFromLine className="w-[40px] h-[48px] text-[#1a3129]"></ArrowUpFromLine>
+                                <h1 className=" text-[32px] text-bold text-[#1a3129]">Scan Table Nutrition Facts</h1>
+                                <button type="button"
+                                className="rounded-md bg-[#cbea7b] px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-base md:text-lg font-semibold text-black hover:bg-[#b8d96a] w-full sm:w-auto">
+                                Scan & Analisis!
+                                </button>
+                            </div>
+                        </div>   
+                    </div>
+                </div>
+                <Image
+                src="/images/hero/pngwing 8.png"
+                alt="Salad"
+                width={583}
+                height={580}
+                priority
+                className="absolute bottom-0 left-0 h-auto w-full max-w-140 z-[-1]"
+                />
+            </div>
+            <Footer />
         </div>
+
     );
 }
