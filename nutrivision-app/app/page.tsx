@@ -163,35 +163,48 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className="relative  bg-[#EDFFDE] w-full h-200 max-w-screen py-[20px] text-[#1a3129] flex flex-col items-center justify-center gap-16 z-0">
-                <div className="flex flex-col items-center gap-4">
-                    <h2 className="inline-block border-b-3 border-[#cbea7b] text-6xl sm:mt-4 text-4xl sm:text-5xl md:text-6xl font-bold">Mulai Scan Sekarang!</h2>
-                    <p className=" pb-2 text-base sm:text-lg md:text-xl text-center text-[#262626]">Unggah label Nutrition Facts dan mulai analisis gizi dalam hitungan detik</p>
-                </div>
-                <div className="relative flex items-center justify-center px-4">
-                    <div className="p-6 bg-[#FAFDF2] w-full max-w-[713px] h-[365px] rounded-[32px] shadow-sm flex items-center justify-center">
-                        <div className="flex items-center justify-center bg-[#FAFDF2] rounded-[16px] border-2 border-dotted border-[#1A3129] w-[661px] h-[325px] rounded-16 flex-shrink-0">
-                            <div className=" grid grid-rows-3 justify-items-center items-center gap-y-[10px]">
-                                <ArrowUpFromLine className="w-[40px] h-[48px] text-[#1a3129]"></ArrowUpFromLine>
-                                <h1 className=" text-[32px] text-bold text-[#1a3129]">Scan Table Nutrition Facts</h1>
-                                <button type="button"
-                                className="rounded-md bg-[#cbea7b] px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-base md:text-lg font-semibold text-black hover:bg-[#b8d96a] w-full sm:w-auto">
+            <div className="relative bg-[#EDFFDE] w-full min-h-screen py-10 md:py-20 text-[#1a3129] flex flex-col items-center justify-center gap-10 md:gap-16 overflow-hidden">
+    
+            <div className="flex flex-col items-center gap-4 px-6 text-center">
+                <h2 className="inline-block border-b-3 border-[#cbea7b] text-3xl sm:text-4xl md:text-6xl font-bold leading-tight">
+                    Mulai Scan Sekarang!
+                </h2>
+                <p className="max-w-md md:max-w-2xl text-sm sm:text-lg md:text-xl text-[#262626]">
+                    Unggah label Nutrition Facts dan mulai analisis gizi dalam hitungan detik
+                </p>
+            </div>
+
+            <div className="relative flex items-center justify-center px-4 w-full">
+                <div className="p-4 md:p-6 bg-[#FAFDF2] w-full max-w-[713px] h-auto min-h-[300px] md:h-[365px] rounded-[24px] md:rounded-[32px] shadow-sm flex items-center justify-center">
+                    
+                    <div className="flex items-center justify-center border-2 border-dotted border-[#1A3129] w-full h-full py-10 md:py-0 rounded-[16px] md:rounded-16">
+                        
+                        <div className="flex flex-col items-center justify-center gap-4 md:gap-6 px-4">
+                            <ArrowUpFromLine className="w-[32px] md:w-[40px] h-[40px] md:h-[48px] text-[#1a3129]" />
+                            
+                            <h1 className="text-xl md:text-[32px] font-bold text-[#1a3129] text-center leading-tight">
+                                Scan Table Nutrition Facts
+                            </h1>
+                            
+                            <button type="button"
+                                className="rounded-full bg-[#cbea7b] px-8 md:px-10 py-3 md:py-4 text-sm md:text-lg font-bold text-black hover:bg-[#b8d96a] transition-all active:scale-95">
                                 Scan & Analisis!
-                                </button>
-                            </div>
-                        </div>   
-                    </div>
+                            </button>
+                        </div>
+                    </div>   
                 </div>
-                <Image
+            </div>
+            
+            <Image
                 src="/images/hero/pngwing 8.png"
                 alt="Salad"
                 width={583}
                 height={580}
                 priority
-                className="absolute bottom-0 left-0 h-auto w-full max-w-140 z-[-1]"
-                />
-            </div>
-            <Footer />
+                className="absolute bottom-0 left-0 h-auto w-[200px] md:w-full max-w-[300px] md:max-w-140 z-[-1] opacity-50 md:opacity-100"
+            />
+        </div>
+        <Footer />
         </div>
 
     );
