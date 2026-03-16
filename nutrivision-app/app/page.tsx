@@ -1,9 +1,10 @@
 import Image from "next/image";
+import Footer from "@/components/Footer";
 
 export default function Home() {
     return (
         <div className="min-h-screen bg-background font-sans">
-            <main className="mx-auto grid w-full max-w-7xl items-center px-4 sm:px-6 md:px-8 grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 py-8 sm:py-10 md:py-14">
+            <main id="beranda" className="mx-auto grid w-full max-w-7xl items-center px-4 sm:px-6 md:px-8 grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 py-8 sm:py-10 md:py-14">
                 <section className="max-w-xl text-left">
                     <p className="inline-block border-b-3 border-[#cbea7b] pb-2 font-bold text-foreground text-lg sm:text-2xl">
                         Wujudkan Hidup Lebih Sehat dengan
@@ -51,7 +52,7 @@ export default function Home() {
                     />
                 </section>
             </main>
-            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-8 py-10 sm:py-14 md:py-16 lg:py-20 text-[#1a3129] flex flex-col items-center gap-10">
+            <div id="tentang" className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-8 py-10 sm:py-14 md:py-16 lg:py-20 text-[#1a3129] flex flex-col items-center gap-10">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold">Tentang <span className="font-extrabold">NutriVision</span></h1>
                 <p className="text-center text-sm sm:text-base md:text-lg lg:text-xl leading-6 sm:leading-7 md:leading-8 text-[#262626]\">
                     NutriVision adalah platform analisis gizi berbasis AI yang
@@ -172,6 +173,7 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+        <Footer />
         </div>
     );
 }
