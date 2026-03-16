@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
     const [activeSection, setActiveSection] = useState('beranda');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const pathname = usePathname();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -33,6 +35,9 @@ export default function Navbar() {
         const element = document.getElementById(sectionId);
         if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            // If element doesn't exist on current page, navigate to home with anchor
+            window.location.href = `/#${sectionId}`;
         }
         setIsMenuOpen(false);
     };
@@ -53,7 +58,7 @@ export default function Navbar() {
                             href="#beranda" 
                             onClick={(e) => handleNavClick(e, 'beranda')}
                             className={`text-md font-regular font-sans transition ${
-                                activeSection === 'beranda' 
+                                pathname === '/' && activeSection === 'beranda' 
                                     ? 'text-lime-300 hover:text-lime-200' 
                                     : 'text-stone-50 hover:text-lime-300'
                             }`}
@@ -64,7 +69,7 @@ export default function Navbar() {
                             href="#tentang" 
                             onClick={(e) => handleNavClick(e, 'tentang')}
                             className={`text-md font-regular font-sans transition ${
-                                activeSection === 'tentang' 
+                                pathname === '/' && activeSection === 'tentang' 
                                     ? 'text-lime-300 hover:text-lime-200' 
                                     : 'text-stone-50 hover:text-lime-300'
                             }`}
@@ -101,7 +106,7 @@ export default function Navbar() {
                             href="#beranda" 
                             onClick={(e) => handleNavClick(e, 'beranda')}
                             className={`text-md font-regular font-sans text-center transition ${
-                                activeSection === 'beranda' 
+                                pathname === '/' && activeSection === 'beranda' 
                                     ? 'text-lime-300 hover:text-lime-200' 
                                     : 'text-stone-50 hover:text-lime-300'
                             }`}
@@ -112,7 +117,7 @@ export default function Navbar() {
                             href="#tentang" 
                             onClick={(e) => handleNavClick(e, 'tentang')}
                             className={`text-md font-regular font-sans text-center transition ${
-                                activeSection === 'tentang' 
+                                pathname === '/' && activeSection === 'tentang' 
                                     ? 'text-lime-300 hover:text-lime-200' 
                                     : 'text-stone-50 hover:text-lime-300'
                             }`}
