@@ -36,7 +36,7 @@ export default function LoginPage() {
 
     return (
         <div className="w-full min-h-screen bg-background overflow-hidden">
-            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-8">
+            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-8 pt-8 md:pt-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start min-h-screen py-4 sm:py-6 md:py-8">
                     {/* Left Section - Form */}
                     <div className="flex flex-col justify-start items-start gap-10 w-full max-w-md">
