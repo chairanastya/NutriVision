@@ -1,12 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Navbar() {
     const [activeSection, setActiveSection] = useState('beranda');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const pathname = usePathname();
+    const router = useRouter();
+
+    const handleLoginClick = () => {
+        router.push('/login');
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -43,7 +48,7 @@ export default function Navbar() {
     };
 
     return(
-        <nav className={`sticky top-0 z-50 w-full py-2 ${isMenuOpen ? 'bg-[#1a3129]' : 'bg-[#1a3129]/90 backdrop-blur-md'} border-b border-lime-100/50`}>
+        <nav className={`sticky top-0 z-50 w-full py-2 min-h-[55px] md:min-h-[65px] flex items-center ${isMenuOpen ? 'bg-[#1a3129]' : 'bg-[#1a3129]/90 backdrop-blur-md'} border-b border-lime-100/50`}>
             <div className="flex mx-auto w-full max-w-7xl px-8 justify-between items-center">
                 {/* Logo */}
                 <div className="flex items-center gap-2.5">
@@ -82,9 +87,13 @@ export default function Navbar() {
                     </div>
 
                     {/* Log In Button */}
-                    <button className="px-4 py-3 bg-lime-300 rounded-md hover:bg-lime-200 transition">
-                        <span className="text-md font-regular font-sans text-neutral-800">Log In</span>
-                    </button>
+                    {pathname !== '/login' && pathname !== '/signup' && (
+                        <button 
+                            onClick={handleLoginClick}
+                            className="px-4 py-3 bg-lime-300 rounded-md hover:bg-lime-200 transition">
+                            <span className="text-md font-regular font-sans text-neutral-800">Log In</span>
+                        </button>
+                    )}
                 </div>
 
                 {/* Mobile Menu Button */}
@@ -127,9 +136,13 @@ export default function Navbar() {
                         <a href="#scan" className="text-md font-regular font-sans text-center text-stone-50 hover:text-lime-300 transition">
                             Scan
                         </a>
-                        <button className="mt-2 mx-auto px-4 py-3 bg-lime-300 rounded-md hover:bg-lime-200 transition">
-                            <span className="text-md font-regular font-sans text-neutral-800">Log In</span>
-                        </button>
+                        {pathname !== '/login' && pathname !== '/signup' && (
+                            <button 
+                                onClick={handleLoginClick}
+                                className="mt-2 mx-auto px-4 py-3 bg-lime-300 rounded-md hover:bg-lime-200 transition">
+                                <span className="text-md font-regular font-sans text-neutral-800">Log In</span>
+                            </button>
+                        )}
                     </div>
                 </div>
             )}

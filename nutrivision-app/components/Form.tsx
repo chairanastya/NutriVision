@@ -25,6 +25,8 @@ export interface FormConfig {
     footerLinkText?: string;
     footerLinkHref?: string;
     customValidation?: (formData: Record<string, string>) => Record<string, string>;
+    showForgotPassword?: boolean;
+    forgotPasswordHref?: string;
 }
 
 interface FormData {
@@ -154,9 +156,14 @@ export default function Form({ config }: { config: FormConfig }) {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                setErrors({
-                    submit: errorData.message || 'Gagal memproses form',
-                });
+                // Handle per-field errors atau error message
+                if (errorData.errors && typeof errorData.errors === 'object') {
+                    setErrors(errorData.errors);
+                } else {
+                    setErrors({
+                        submit: errorData.message || 'Gagal memproses form',
+                    });
+                }
                 return;
             }
 
@@ -281,6 +288,17 @@ export default function Form({ config }: { config: FormConfig }) {
                     </div>
                 ))}
             </div>
+
+            {/* Forgot Password Link */}
+            {config.showForgotPassword && config.forgotPasswordHref && (
+                <div className="flex justify-end">
+                    <Link
+                        href={config.forgotPasswordHref}
+                        className="text-[#1a3129] text-sm font-medium hover:underline transition">
+                        Lupa password?
+                    </Link>
+                </div>
+            )}
 
             {/* Error atau Success Messages */}
             {errors.submit && (
