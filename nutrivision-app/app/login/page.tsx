@@ -1,9 +1,40 @@
 'use client';
 
 import Image from 'next/image';
+import { useState } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 import Form, { FormConfig } from '@/components/Form';
 
 export default function LoginPage() {
+    const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
+
+    const handleGoogleSuccess = async (credentialResponse: any) => {
+        setIsLoadingGoogle(true);
+        try {
+            const response = await fetch('/api/auth/google/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: credentialResponse.credential }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error('Google login error:', data.message);
+                return;
+            }
+
+            // Redirect ke dashboard
+            window.location.href = '/dashboard';
+        } catch (error) {
+            console.error('Google login error:', error);
+        } finally {
+            setIsLoadingGoogle(false);
+        }
+    };
+
     const loginFormConfig: FormConfig = {
         title: 'Log In',
         fields: [
@@ -41,6 +72,23 @@ export default function LoginPage() {
                     {/* Left Section - Form */}
                     <div className="flex flex-col justify-start items-start gap-10 w-full max-w-md">
                         <Form config={loginFormConfig} />
+                        
+                        {/* Divider */}
+                        <div className="w-full flex items-center gap-4">
+                            <div className="flex-1 h-px bg-gray-300"></div>
+                            <span className="text-gray-600 text-sm font-medium">atau login melalui</span>
+                            <div className="flex-1 h-px bg-gray-300"></div>
+                        </div>
+
+                        {/* Google Login Button */}
+                        <div className="w-full flex justify-center">
+                            <GoogleLogin
+                                onSuccess={handleGoogleSuccess}
+                                onError={() => console.error('Google login failed')}
+                                theme="outline"
+                                text="signin_with"
+                            />
+                        </div>
                     </div>
 
                     {/* Right Section - Image */}
