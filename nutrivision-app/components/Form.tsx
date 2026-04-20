@@ -167,6 +167,13 @@ export default function Form({ config }: { config: FormConfig }) {
                 return;
             }
 
+            const data = await response.json();
+            
+            // Simpan user data ke localStorage jika ada (untuk login)
+            if (data.user) {
+                localStorage.setItem('user', JSON.stringify(data.user));
+            }
+            
             setSuccess(true);
             setFormData(initialFormData);
 
