@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Footer from "@/components/Footer";
+import MedForm from "@/components/user/MedForm";
 
 interface User {
     id: number;
@@ -14,6 +15,7 @@ interface User {
 export default function Dashboard() {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -128,6 +130,133 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* --- Section Header dengan Tombol Edit --- */}
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-6 bg-[#2d6a3e] rounded-full"></span>
+                            <h2 className="text-xl font-bold text-[#1a3129]">
+                                Status Kesehatan
+                            </h2>
+                        </div>
+                        <button
+                            className="flex items-center gap-2 px-4 py-2 bg-white border border-lime-200 text-[#2d6a3e] rounded-lg text-sm font-semibold hover:bg-lime-50 transition-all shadow-xs"
+                            onClick={() => setIsModalOpen(true)}>
+                            <span>✏️</span>
+                            Lengkapi / Edit Data
+                        </button>
+                    </div>
+
+                    {/* Grid 3 Kartu (Profil Fisik, Riwayat Medis, Target) */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+                        {/* Card 1: Profil Fisik */}
+                        <div className="p-5 bg-white rounded-[10px] border border-lime-200 shadow-sm flex flex-col gap-3">
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xl">📊</span>
+                                <h3 className="font-bold text-[#1a3129] text-sm uppercase tracking-wide">
+                                    Profil Fisik
+                                </h3>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-[10px] text-gray-400 uppercase font-bold">
+                                        Berat / Tinggi
+                                    </p>
+                                    <p className="text-sm font-semibold text-[#1a3129]">
+                                        70 kg / 175 cm
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-gray-400 uppercase font-bold">
+                                        Status BMI
+                                    </p>
+                                    <p className="text-sm font-semibold text-green-600">
+                                        22.9 (Ideal)
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-gray-400 uppercase font-bold">
+                                        Umur
+                                    </p>
+                                    <p className="text-sm font-semibold text-[#1a3129]">
+                                        23 Tahun
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-gray-400 uppercase font-bold">
+                                        Aktivitas
+                                    </p>
+                                    <p className="text-sm font-semibold text-[#1a3129]">
+                                        Moderat
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Card 2: Riwayat Medis */}
+                        <div className="p-5 bg-white rounded-[10px] border border-lime-200 shadow-sm flex flex-col gap-3">
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xl">🏥</span>
+                                <h3 className="font-bold text-[#1a3129] text-sm uppercase tracking-wide">
+                                    Riwayat Medis
+                                </h3>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                <span className="px-3 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-full border border-red-100">
+                                    Diabetes Tipe 2
+                                </span>
+                                <span className="px-3 py-1 bg-orange-50 text-orange-600 text-xs font-bold rounded-full border border-orange-100">
+                                    Hipertensi
+                                </span>
+                            </div>
+                            <p className="text-[11px] text-gray-500 italic mt-auto">
+                                *Sistem akan memberikan peringatan otomatis pada
+                                makanan tinggi Gula & Natrium.
+                            </p>
+                        </div>
+
+                        {/* Card 3: Target Personalisasi */}
+                        <div className="p-5 bg-white rounded-[10px] border border-lime-200 shadow-sm flex flex-col gap-3">
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xl">🎯</span>
+                                <h3 className="font-bold text-[#1a3129] text-sm uppercase tracking-wide">
+                                    Target Personalisasi
+                                </h3>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-xs text-gray-600">
+                                        Batas Gula
+                                    </span>
+                                    <span className="text-xs font-bold text-red-500">
+                                        Maks. 25g
+                                    </span>
+                                </div>
+                                <div className="w-full bg-gray-100 rounded-full h-1.5">
+                                    <div
+                                        className="bg-red-400 h-1.5 rounded-full"
+                                        style={{ width: "40%" }}></div>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-xs text-gray-600">
+                                        Batas Natrium
+                                    </span>
+                                    <span className="text-xs font-bold text-orange-500">
+                                        Maks. 1500mg
+                                    </span>
+                                </div>
+                                <div className="w-full bg-gray-100 rounded-full h-1.5">
+                                    <div
+                                        className="bg-orange-400 h-1.5 rounded-full"
+                                        style={{ width: "60%" }}></div>
+                                </div>
+                            </div>
+                        </div>
+                        <MedForm
+                            isOpen={isModalOpen}
+                            onClose={() => setIsModalOpen(false)}
+                        />
                     </div>
 
                     {/* Main Content Grid */}
