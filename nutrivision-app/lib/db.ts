@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { Pool } from "pg";
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -9,7 +9,7 @@ const pool = new Pool({
 
 export async function queryDatabase(
     query: string,
-    values?: (string | number | null)[]
+    values?: (string | number | null)[],
 ) {
     const client = await pool.connect();
     try {

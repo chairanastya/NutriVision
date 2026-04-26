@@ -1,37 +1,37 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Form, { FormConfig } from '@/components/Form';
+import Image from "next/image";
+import Form, { FormConfig } from "@/components/Form";
 
 export default function LoginPage() {
     const loginFormConfig: FormConfig = {
-        title: 'Log In',
+        title: "Log In",
         fields: [
             {
-                name: 'email',
-                label: 'Email',
-                type: 'email',
-                placeholder: 'abc@gmail.com',
+                name: "email",
+                label: "Email",
+                type: "email",
+                placeholder: "abc@gmail.com",
                 required: true,
             },
             {
-                name: 'password',
-                label: 'Password',
-                type: 'password',
-                placeholder: 'Masukkan password',
+                name: "password",
+                label: "Password",
+                type: "password",
+                placeholder: "Masukkan password",
                 required: true,
             },
         ],
-        submitButtonLabel: 'Log In',
-        apiEndpoint: '/api/auth/login',
-        successMessage: 'Login berhasil! Redirecting ke dashboard...',
-        redirectTo: '/dashboard',
+        submitButtonLabel: "Log In",
+        apiEndpoint: "/api/auth/login",
+        successMessage: "Login berhasil! Redirecting ke dashboard...",
+        redirectTo: "/dashboard",
         redirectDelay: 2000,
-        footerText: 'Belum punya akun?',
-        footerLinkText: 'Daftar',
-        footerLinkHref: '/signup',
+        footerText: "Belum punya akun?",
+        footerLinkText: "Daftar",
+        footerLinkHref: "/signup",
         showForgotPassword: true,
-        forgotPasswordHref: '/forgot-password',
+        forgotPasswordHref: "/forgot-password",
     };
 
     return (
