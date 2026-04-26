@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { queryDatabase } from '@/lib/db';
+import { createSessionToken, SESSION_COOKIE_NAME } from '@/lib/session';
 
 interface LoginRequest {
     email: string;
@@ -54,8 +55,15 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Login berhasil - return user data (jangan return password)
-        return NextResponse.json(
+        const sessionUser = {
+            id: Number(user.id),
+            name: String(user.name),
+            email: String(user.email),
+        };
+
+        const token = await createSessionToken(sessionUser);
+
+        const response = NextResponse.json(
             {
                 message: 'Login berhasil',
                 user: {
@@ -68,6 +76,18 @@ export async function POST(request: NextRequest) {
             },
             { status: 200 }
         );
+
+        response.cookies.set({
+            name: SESSION_COOKIE_NAME,
+            value: token,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 60 * 60 * 24 * 7,
+        });
+
+        return response;
     } catch (error) {
         console.error('Login error:', error);
 
