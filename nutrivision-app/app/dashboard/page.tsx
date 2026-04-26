@@ -254,10 +254,6 @@ export default function Dashboard() {
                                 <div className="text-2xl md:text-3xl font-bold">{loading ? '-' : (data?.dailyStats?.item_count || 0)}</div>
                                 <div className="text-xs opacity-80">item makanan</div>
                             </div>
-                            <div className="text-center">
-                                <div className="text-2xl md:text-3xl font-bold">{loading ? '-' : '750'}</div>
-                                <div className="text-xs opacity-80">ml air minum</div>
-                            </div>
                         </div>
 
                         {/* Column 3: Nutri-Score */}
