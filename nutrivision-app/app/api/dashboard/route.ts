@@ -1,5 +1,5 @@
-import { queryDatabase } from '@/lib/db';
-import { NextRequest, NextResponse } from 'next/server';
+import { queryDatabase } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
 
 interface NutrientTotal {
     name: string;
@@ -55,35 +55,53 @@ interface DashboardData {
     nutriScoreTrend: NutriScoreTrend[];
 }
 
+type DbNumber = number | string;
+
+interface MacroRow {
+    name: string;
+    unit: string;
+    total_amount: DbNumber | null;
+}
+
+interface TrendRow {
+    date: string | Date;
+    avg_score: DbNumber | null;
+}
+
+function toNumber(value: DbNumber | null): number {
+    if (value === null) return 0;
+    return typeof value === "number" ? value : Number(value);
+}
+
 function scoreToLetter(score: number): string {
-    if (score >= 80) return 'A';
-    if (score >= 60) return 'B';
-    if (score >= 40) return 'C';
-    if (score >= 20) return 'D';
-    return 'E';
+    if (score >= 80) return "A";
+    if (score >= 60) return "B";
+    if (score >= 40) return "C";
+    if (score >= 20) return "D";
+    return "E";
 }
 
 export async function GET(request: NextRequest) {
     try {
-        const userId = request.nextUrl.searchParams.get('userId');
+        const userId = request.nextUrl.searchParams.get("userId");
 
         if (!userId) {
             return NextResponse.json(
-                { error: 'userId parameter is required' },
-                { status: 400 }
+                { error: "userId parameter is required" },
+                { status: 400 },
             );
         }
 
         // 1. Fetch User Info
         const userResult = await queryDatabase(
-            'SELECT id, name, email, phone_number FROM users WHERE id = $1',
-            [userId]
+            "SELECT id, name, email, phone_number FROM users WHERE id = $1",
+            [userId],
         );
 
         if (userResult.rows.length === 0) {
             return NextResponse.json(
-                { error: 'User not found' },
-                { status: 404 }
+                { error: "User not found" },
+                { status: 404 },
             );
         }
 
@@ -100,7 +118,7 @@ export async function GET(request: NextRequest) {
                 weight,
                 gender
             FROM user_health_profiles WHERE user_id = $1`,
-            [userId]
+            [userId],
         );
 
         const healthProfile = healthResult.rows[0] || {
@@ -127,53 +145,58 @@ export async function GET(request: NextRequest) {
             WHERE s.user_id = $1
             ORDER BY s.scanned_at DESC
             LIMIT 10`,
-            [userId]
+            [userId],
         );
 
         const scans = scansResult.rows;
-        console.log('All recent scans for user:', JSON.stringify(scans, null, 2));
-
-        // 4. Calculate Daily Macronutrients (from the scans we just fetched)
-        const macroResult = await queryDatabase(
-            `SELECT 
-                n.name,
-                n.unit,
-                SUM(pn.amount) as total_amount
-            FROM scans s
-            JOIN product_nutrients pn ON s.product_id = pn.product_id
-            JOIN nutrients n ON pn.nutrient_id = n.id
-            WHERE s.user_id = $1 AND s.id IN (${scans.map((_, i) => `$${i + 2}`).join(',')})
-            GROUP BY n.id, n.name, n.unit`,
-            [userId, ...scans.map(s => s.id)]
+        console.log(
+            "All recent scans for user:",
+            JSON.stringify(scans, null, 2),
         );
 
+        // 4. Calculate Daily Macronutrients (from the scans we just fetched)
         const macronutrients: MacronutrientResponse = {
-            protein: { name: 'Protein', total: 0, unit: 'g', limit: 80 },
-            carbs: { name: 'Karbohidrat', total: 0, unit: 'g', limit: 250 },
-            fat: { name: 'Lemak', total: 0, unit: 'g', limit: 55 },
-            fiber: { name: 'Serat', total: 0, unit: 'g', limit: 25 },
+            protein: { name: "Protein", total: 0, unit: "g", limit: 80 },
+            carbs: { name: "Karbohidrat", total: 0, unit: "g", limit: 250 },
+            fat: { name: "Lemak", total: 0, unit: "g", limit: 55 },
+            fiber: { name: "Serat", total: 0, unit: "g", limit: 25 },
         };
 
-        macroResult.rows.forEach((row: any) => {
-            const name = row.name.toLowerCase();
-            const amount = Math.round(row.total_amount * 10) / 10;
+        if (scans.length > 0) {
+            const macroResult = await queryDatabase(
+                `SELECT 
+                    n.name,
+                    n.unit,
+                    SUM(pn.amount) as total_amount
+                FROM scans s
+                JOIN product_nutrients pn ON s.product_id = pn.product_id
+                JOIN nutrients n ON pn.nutrient_id = n.id
+                WHERE s.user_id = $1 AND s.id IN (${scans.map((_, i) => `$${i + 2}`).join(",")})
+                GROUP BY n.id, n.name, n.unit`,
+                [userId, ...scans.map((s) => s.id)],
+            );
 
-            if (name.includes('protein')) {
-                macronutrients.protein.total = amount;
-            } else if (name.includes('carb')) {
-                macronutrients.carbs.total = amount;
-            } else if (name.includes('fat') || name.includes('lipid')) {
-                macronutrients.fat.total = amount;
-            } else if (name.includes('fiber') || name.includes('serat')) {
-                macronutrients.fiber.total = amount;
-            }
-        });
+            (macroResult.rows as MacroRow[]).forEach((row) => {
+                const name = row.name.toLowerCase();
+                const amount = Math.round(toNumber(row.total_amount) * 10) / 10;
+
+                if (name.includes("protein")) {
+                    macronutrients.protein.total = amount;
+                } else if (name.includes("carb")) {
+                    macronutrients.carbs.total = amount;
+                } else if (name.includes("fat") || name.includes("lipid")) {
+                    macronutrients.fat.total = amount;
+                } else if (name.includes("fiber") || name.includes("serat")) {
+                    macronutrients.fiber.total = amount;
+                }
+            });
+        }
 
         // 5. Calculate Total Calories (simplified: assuming ~4cal/g carbs, ~4cal/g protein, ~9cal/g fat)
         const total_calories = Math.round(
             macronutrients.protein.total * 4 +
-            macronutrients.carbs.total * 4 +
-            macronutrients.fat.total * 9
+                macronutrients.carbs.total * 4 +
+                macronutrients.fat.total * 9,
         );
 
         // 6. Fetch Nutri-Score 5-Day Trend (from last 5 days of available data)
@@ -186,14 +209,19 @@ export async function GET(request: NextRequest) {
             GROUP BY DATE(s.scanned_at)
             ORDER BY DATE(s.scanned_at) DESC
             LIMIT 5`,
-            [userId]
+            [userId],
         );
 
-        const nutriScoreTrend: NutriScoreTrend[] = trendResult.rows.map((row: any) => ({
-            date: new Date(row.date).toLocaleDateString('id-ID'),
-            score: Math.round(row.avg_score),
-            letter: scoreToLetter(Math.round(row.avg_score)),
-        }));
+        const nutriScoreTrend: NutriScoreTrend[] = (
+            trendResult.rows as TrendRow[]
+        ).map((row) => {
+            const avgScore = Math.round(toNumber(row.avg_score));
+            return {
+                date: new Date(row.date).toLocaleDateString("id-ID"),
+                score: avgScore,
+                letter: scoreToLetter(avgScore),
+            };
+        });
 
         // 7. Calculate Item Count
         const item_count = scans.length;
@@ -211,15 +239,21 @@ export async function GET(request: NextRequest) {
             nutriScoreTrend,
         };
 
-        console.log('Dashboard response - scans array:', JSON.stringify(scans.slice(0, 2), null, 2));
-        console.log('Dashboard response - first scan product_id:', scans[0]?.product_id);
+        console.log(
+            "Dashboard response - scans array:",
+            JSON.stringify(scans.slice(0, 2), null, 2),
+        );
+        console.log(
+            "Dashboard response - first scan product_id:",
+            scans[0]?.product_id,
+        );
 
         return NextResponse.json(dashboardData);
     } catch (error) {
-        console.error('Dashboard API error:', error);
+        console.error("Dashboard API error:", error);
         return NextResponse.json(
-            { error: 'Internal server error' },
-            { status: 500 }
+            { error: "Internal server error" },
+            { status: 500 },
         );
     }
 }
