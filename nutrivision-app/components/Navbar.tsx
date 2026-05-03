@@ -16,7 +16,7 @@ export default function Navbar() {
 
     useEffect(() => {
         const handleScroll = () => {
-            const sections = ["beranda", "tentang"];
+            const sections = ["beranda", "tentang", "scan"];
             let current = "beranda";
 
             for (const sectionId of sections) {
@@ -32,6 +32,7 @@ export default function Navbar() {
             setActiveSection(current);
         };
 
+        handleScroll();
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
@@ -175,7 +176,12 @@ export default function Navbar() {
                         </a>
                         <a
                             href="#scan"
-                            className="text-md font-regular font-sans text-center text-stone-50 hover:text-lime-300 transition">
+                            onClick={(e) => handleNavClick(e, "scan")}
+                            className={`text-md font-regular font-sans text-center transition ${
+                                pathname === "/" && activeSection === "scan"
+                                    ? "text-lime-300 hover:text-lime-200"
+                                    : "text-stone-50 hover:text-lime-300"
+                            }`}>
                             Scan
                         </a>
                         {isLoggedIn === false &&

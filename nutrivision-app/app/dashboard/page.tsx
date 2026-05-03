@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Camera } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import MedForm from "@/components/user/MedForm";
 
@@ -38,7 +39,23 @@ interface DashboardData {
         height: number | null;
         weight: number | null;
         gender: string | null;
+        birth_date: string | null;
+        activity_level: string | null;
     };
+    medicalConditions: Array<{ id: number; name: string }>;
+    recommendedTargets: Array<{
+        nutrientId: number;
+        nutrientName: string | null;
+        unit: string | null;
+        recommendedLimit: number | null;
+        reasons: string[];
+    }>;
+    customTargets: Array<{
+        nutrientId: number;
+        nutrientName: string;
+        unit: string | null;
+        dailyLimit: number;
+    }>;
     dailyStats: {
         total_calories: number;
         item_count: number;
@@ -73,6 +90,7 @@ interface ProductDetail {
 }
 
 export default function Dashboard() {
+    const router = useRouter();
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -82,38 +100,133 @@ export default function Dashboard() {
     const [modalError, setModalError] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                const storedUser = localStorage.getItem("user");
-                if (!storedUser) {
-                    setError("User not found. Please login.");
-                    setLoading(false);
-                    return;
-                }
+    const fetchDashboardData = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
 
-                const userData = JSON.parse(storedUser);
-                const userId = userData.id;
-
-                const response = await fetch(`/api/dashboard?userId=${userId}`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch dashboard data");
-                }
-
-                const dashboardData: DashboardData = await response.json();
-                setData(dashboardData);
-            } catch (err) {
-                console.error("Error fetching dashboard data:", err);
-                setError(
-                    err instanceof Error ? err.message : "An error occurred",
-                );
-            } finally {
-                setLoading(false);
+            const response = await fetch("/api/dashboard", {
+                credentials: "include",
+            });
+            if (response.status === 401) {
+                setError("Silakan login dulu.");
+                router.push("/login");
+                return;
             }
-        };
 
+            if (!response.ok) {
+                const errJson = (await response.json().catch(() => null)) as {
+                    error?: string;
+                    message?: string;
+                    details?: string;
+                } | null;
+                const msg =
+                    errJson?.error ||
+                    errJson?.message ||
+                    errJson?.details ||
+                    "Failed to fetch dashboard data";
+                throw new Error(`(${response.status}) ${msg}`);
+            }
+
+            const dashboardData: DashboardData = await response.json();
+            setData(dashboardData);
+        } catch (err) {
+            console.error("Error fetching dashboard data:", err);
+            setError(err instanceof Error ? err.message : "An error occurred");
+        } finally {
+            setLoading(false);
+        }
+    }, [router]);
+
+    useEffect(() => {
         fetchDashboardData();
-    }, []);
+    }, [fetchDashboardData]);
+
+    const health = data?.healthProfile;
+    const weightKg = health?.weight ?? null;
+    const heightCm = health?.height ?? null;
+
+    const bmiInfo = useMemo(() => {
+        if (!weightKg || !heightCm) return null;
+        const heightM = heightCm / 100;
+        if (!Number.isFinite(heightM) || heightM <= 0) return null;
+        const bmi = weightKg / (heightM * heightM);
+        const bmiRounded = Math.round(bmi * 10) / 10;
+
+        if (bmiRounded < 18.5) {
+            return {
+                value: bmiRounded,
+                label: "Kurus",
+                className: "text-orange-600",
+            };
+        }
+        if (bmiRounded < 25) {
+            return {
+                value: bmiRounded,
+                label: "Ideal",
+                className: "text-green-600",
+            };
+        }
+        if (bmiRounded < 30) {
+            return {
+                value: bmiRounded,
+                label: "Berlebih",
+                className: "text-orange-600",
+            };
+        }
+        return {
+            value: bmiRounded,
+            label: "Obesitas",
+            className: "text-red-600",
+        };
+    }, [weightKg, heightCm]);
+
+    const recommendedTargets = useMemo(
+        () => data?.recommendedTargets ?? [],
+        [data?.recommendedTargets],
+    );
+    const customTargets = useMemo(
+        () => data?.customTargets ?? [],
+        [data?.customTargets],
+    );
+    const customTargetById = useMemo(() => {
+        return new Map(customTargets.map((t) => [t.nutrientId, t] as const));
+    }, [customTargets]);
+
+    const ageYears = useMemo(() => {
+        const birthDate = health?.birth_date;
+        if (!birthDate) return null;
+        const parts = birthDate.split("-").map((p) => Number(p));
+        if (parts.length !== 3) return null;
+        const [y, m, d] = parts;
+        if (!y || !m || !d) return null;
+
+        const dob = new Date(y, m - 1, d);
+        if (Number.isNaN(dob.getTime())) return null;
+
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+        if (
+            monthDiff < 0 ||
+            (monthDiff === 0 && today.getDate() < dob.getDate())
+        ) {
+            age -= 1;
+        }
+        return age >= 0 ? age : null;
+    }, [health?.birth_date]);
+
+    const activityLabel = useMemo(() => {
+        const level = health?.activity_level;
+        if (!level) return "-";
+        const normalized = String(level).toLowerCase();
+        if (normalized === "sedentary") return "Sedentary";
+        if (normalized === "light") return "Ringan";
+        if (normalized === "moderate") return "Moderat";
+        if (normalized === "active") return "Aktif";
+        if (normalized === "very_active") return "Sangat Aktif";
+        return level;
+    }, [health?.activity_level]);
 
     const fetchProductDetail = async (scan: Scan) => {
         try {
@@ -466,7 +579,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* --- Section Header dengan Tombol Edit --- */}
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center justify-between m-4">
                             <div className="flex items-center gap-2">
                                 <span className="w-2 h-6 bg-[#2d6a3e] rounded-full"></span>
                                 <h2 className="text-xl font-bold text-[#1a3129]">
@@ -497,15 +610,22 @@ export default function Dashboard() {
                                             Berat / Tinggi
                                         </p>
                                         <p className="text-sm font-semibold text-[#1a3129]">
-                                            70 kg / 175 cm
+                                            {loading
+                                                ? "-"
+                                                : `${weightKg ?? "-"} kg / ${heightCm ?? "-"} cm`}
                                         </p>
                                     </div>
                                     <div>
                                         <p className="text-[10px] text-gray-400 uppercase font-bold">
                                             Status BMI
                                         </p>
-                                        <p className="text-sm font-semibold text-green-600">
-                                            22.9 (Ideal)
+                                        <p
+                                            className={`text-sm font-semibold ${bmiInfo?.className || "text-[#1a3129]"}`}>
+                                            {loading
+                                                ? "-"
+                                                : bmiInfo
+                                                  ? `${bmiInfo.value} (${bmiInfo.label})`
+                                                  : "-"}
                                         </p>
                                     </div>
                                     <div>
@@ -513,7 +633,11 @@ export default function Dashboard() {
                                             Umur
                                         </p>
                                         <p className="text-sm font-semibold text-[#1a3129]">
-                                            23 Tahun
+                                            {loading
+                                                ? "-"
+                                                : ageYears !== null
+                                                  ? `${ageYears} Tahun`
+                                                  : "-"}
                                         </p>
                                     </div>
                                     <div>
@@ -521,7 +645,7 @@ export default function Dashboard() {
                                             Aktivitas
                                         </p>
                                         <p className="text-sm font-semibold text-[#1a3129]">
-                                            Moderat
+                                            {loading ? "-" : activityLabel}
                                         </p>
                                     </div>
                                 </div>
@@ -536,17 +660,28 @@ export default function Dashboard() {
                                     </h3>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    <span className="px-3 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-full border border-red-100">
-                                        Diabetes Tipe 2
-                                    </span>
-                                    <span className="px-3 py-1 bg-orange-50 text-orange-600 text-xs font-bold rounded-full border border-orange-100">
-                                        Hipertensi
-                                    </span>
+                                    {loading ? (
+                                        <span className="text-xs text-gray-500">
+                                            -
+                                        </span>
+                                    ) : data?.medicalConditions?.length ? (
+                                        data.medicalConditions.map((c, idx) => (
+                                            <span
+                                                key={c.id}
+                                                className={
+                                                    idx % 2 === 0
+                                                        ? "px-3 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-full border border-red-100"
+                                                        : "px-3 py-1 bg-orange-50 text-orange-600 text-xs font-bold rounded-full border border-orange-100"
+                                                }>
+                                                {c.name}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span className="text-xs text-gray-500">
+                                            Belum ada data
+                                        </span>
+                                    )}
                                 </div>
-                                <p className="text-[11px] text-gray-500 italic mt-auto">
-                                    *Sistem akan memberikan peringatan otomatis
-                                    pada makanan tinggi Gula & Natrium.
-                                </p>
                             </div>
 
                             {/* Card 3: Target Personalisasi */}
@@ -558,37 +693,172 @@ export default function Dashboard() {
                                     </h3>
                                 </div>
                                 <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-xs text-gray-600">
-                                            Batas Gula
-                                        </span>
-                                        <span className="text-xs font-bold text-red-500">
-                                            Maks. 25g
-                                        </span>
+                                    <div className="text-[11px] text-gray-500">
+                                        {loading
+                                            ? "-"
+                                            : recommendedTargets.length
+                                              ? `Rekomendasi otomatis: ${recommendedTargets
+                                                    .map((t) => t.nutrientName)
+                                                    .filter(Boolean)
+                                                    .join(", ")}`
+                                              : "Tidak ada rekomendasi khusus dari riwayat medis"}
                                     </div>
-                                    <div className="w-full bg-gray-100 rounded-full h-1.5">
-                                        <div
-                                            className="bg-red-400 h-1.5 rounded-full"
-                                            style={{ width: "40%" }}></div>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-xs text-gray-600">
-                                            Batas Natrium
-                                        </span>
-                                        <span className="text-xs font-bold text-orange-500">
-                                            Maks. 1500mg
-                                        </span>
-                                    </div>
-                                    <div className="w-full bg-gray-100 rounded-full h-1.5">
-                                        <div
-                                            className="bg-orange-400 h-1.5 rounded-full"
-                                            style={{ width: "60%" }}></div>
-                                    </div>
+                                    {loading ? null : recommendedTargets.length ? (
+                                        <div className="space-y-3">
+                                            {recommendedTargets.map((t) => {
+                                                const name = (
+                                                    t.nutrientName ?? "Nutrisi"
+                                                ).trim();
+                                                const lower =
+                                                    name.toLowerCase();
+                                                const isSugar =
+                                                    /sugar|gula/.test(lower);
+                                                const isSodium =
+                                                    /sodium|natrium/.test(
+                                                        lower,
+                                                    );
+                                                const isFat =
+                                                    /fat|lemak/.test(lower) &&
+                                                    !/jenuh|saturated/.test(
+                                                        lower,
+                                                    );
+                                                const isCalories =
+                                                    /calorie|kalori|energi/.test(
+                                                        lower,
+                                                    );
+
+                                                const custom =
+                                                    customTargetById.get(
+                                                        t.nutrientId,
+                                                    );
+
+                                                const profileLimit = isSugar
+                                                    ? (data?.healthProfile
+                                                          ?.daily_sugar_limit ??
+                                                      null)
+                                                    : isSodium
+                                                      ? (data?.healthProfile
+                                                            ?.daily_sodium_limit ??
+                                                        null)
+                                                      : isFat
+                                                        ? (data?.healthProfile
+                                                              ?.daily_fat_limit ??
+                                                          null)
+                                                        : isCalories
+                                                          ? (data?.healthProfile
+                                                                ?.daily_calories_target ??
+                                                            null)
+                                                          : null;
+
+                                                const maxValue =
+                                                    profileLimit ??
+                                                    custom?.dailyLimit ??
+                                                    t.recommendedLimit ??
+                                                    null;
+
+                                                const unit = isSugar
+                                                    ? "g"
+                                                    : isSodium
+                                                      ? "mg"
+                                                      : isFat
+                                                        ? "g"
+                                                        : isCalories
+                                                          ? "kcal"
+                                                          : (custom?.unit ??
+                                                            t.unit ??
+                                                            "");
+
+                                                const colorClass = isSugar
+                                                    ? "text-red-500"
+                                                    : isSodium
+                                                      ? "text-orange-500"
+                                                      : "text-[#1a3129]";
+
+                                                return (
+                                                    <div
+                                                        key={t.nutrientId}
+                                                        className="space-y-1">
+                                                        <div className="flex justify-between items-center">
+                                                            <span className="text-xs text-gray-600">
+                                                                {name}
+                                                            </span>
+                                                            <span
+                                                                className={`text-xs font-bold ${colorClass}`}>
+                                                                Maks.{" "}
+                                                                {maxValue ===
+                                                                    null ||
+                                                                !Number.isFinite(
+                                                                    maxValue,
+                                                                )
+                                                                    ? "-"
+                                                                    : `${maxValue}${unit}`}
+                                                                {t.recommendedLimit !==
+                                                                    null &&
+                                                                profileLimit !==
+                                                                    null ? (
+                                                                    <span className="ml-2 text-[10px] font-semibold text-gray-400">
+                                                                        (Rekom.{" "}
+                                                                        {`${t.recommendedLimit}${t.unit ?? unit}`}
+                                                                        )
+                                                                    </span>
+                                                                ) : null}
+                                                            </span>
+                                                        </div>
+                                                        {isSugar ? (
+                                                            <div className="w-full bg-gray-100 rounded-full h-1.5">
+                                                                <div
+                                                                    className="bg-red-400 h-1.5 rounded-full"
+                                                                    style={{
+                                                                        width: "40%",
+                                                                    }}></div>
+                                                            </div>
+                                                        ) : isSodium ? (
+                                                            <div className="w-full bg-gray-100 rounded-full h-1.5">
+                                                                <div
+                                                                    className="bg-orange-400 h-1.5 rounded-full"
+                                                                    style={{
+                                                                        width: "60%",
+                                                                    }}></div>
+                                                            </div>
+                                                        ) : null}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <div className="text-xs text-gray-500">
+                                            -
+                                        </div>
+                                    )}
+
+                                    {loading ? null : customTargets.length ? (
+                                        <div className="pt-2 space-y-1">
+                                            <div className="text-[11px] text-gray-500 font-semibold">
+                                                Target kustom
+                                            </div>
+                                            {customTargets.map((t) => (
+                                                <div
+                                                    key={t.nutrientId}
+                                                    className="flex justify-between items-center">
+                                                    <span className="text-xs text-gray-600">
+                                                        {t.nutrientName}
+                                                    </span>
+                                                    <span className="text-xs font-bold text-[#1a3129]">
+                                                        Maks. {t.dailyLimit}
+                                                        {t.unit ?? ""}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : null}
                                 </div>
                             </div>
                             <MedForm
                                 isOpen={isModalOpen}
                                 onClose={() => setIsModalOpen(false)}
+                                onSaved={() => {
+                                    fetchDashboardData();
+                                }}
                             />
                         </div>
 

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import Footer from "@/components/Footer";
 import {
     Camera,
@@ -14,7 +15,7 @@ export default function Home() {
         <div className="min-h-screen bg-background font-sans">
             <main
                 id="beranda"
-                className="mx-auto grid w-full max-w-7xl items-center px-4 sm:px-6 md:px-8 grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 py-8 sm:py-10 md:py-14">
+                className="mx-auto grid w-full max-w-7xl items-center px-4 sm:px-6 md:px-8 grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 py-8 sm:py-10 md:py-14 ">
                 <section className="max-w-xl text-left">
                     <p className="inline-block border-b-3 border-[#cbea7b] pb-2 font-bold text-foreground text-lg sm:text-2xl">
                         Wujudkan Hidup Lebih Sehat dengan
@@ -42,11 +43,11 @@ export default function Home() {
                             className="rounded-md bg-[#cbea7b] px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-base md:text-lg font-semibold text-black hover:bg-[#b8d96a] w-full sm:w-auto">
                             Mulai Scan
                         </button>
-                        <button
-                            type="button"
-                            className="rounded-md border border-black/15 bg-transparent px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-base md:text-lg font-semibold text-foreground hover:bg-black/5 w-full sm:w-auto">
+                        <Link
+                            href="/login"
+                            className="rounded-md border border-black/15 bg-transparent px-3 sm:px-5 py-1.5 sm:py-2 text-sm sm:text-base md:text-lg font-semibold text-foreground hover:bg-black/5 w-full sm:w-auto text-center">
                             Log In
-                        </button>
+                        </Link>
                     </div>
                 </section>
 
