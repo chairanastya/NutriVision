@@ -9,14 +9,19 @@ INSTRUCTIONS:
 1. Identify if the image is a "nutrition_label" or "cooked_food".
 2. If "nutrition_label": Extract exact data. 
 3. If "cooked_food": Estimate the ingredients, portions, and nutrients based on visual analysis.
-4. Calculate a "nutrition_score" (1-10) where 10 is very healthy and 1 is unhealthy, adjusted to the USER CONTEXT.
-5. Provide a "health_analysis" summary (2-3 sentences).
-6. **IMPORTANT**: Use **Indonesian language** for the "health_analysis" and "product_name" fields.
+4. **Assign a "nutrition_grade"** from "A" to "E" based on its healthiness, highly adjusted to the USER CONTEXT:
+   - **A**: Sangat sehat/Sangat direkomendasikan.
+   - **B**: Sehat/Baik dikonsumsi.
+   - **C**: Cukup sehat/Konsumsi secukupnya.
+   - **D**: Kurang sehat/Batasi konsumsi.
+   - **E**: Tidak sehat/Hindari (terutama jika melanggar kondisi medis user).
+5. Provide a "health_analysis" summary (2-3 sentences) in Indonesian.
+6. Use Indonesian language for "product_name" and "health_analysis".
 
 Return ONLY JSON in this format:
 {
   "type": "nutrition_label" | "cooked_food",
-  "product_name": "Nama produk atau makanan dalam bahasa Indonesia",
+  "product_name": "Nama produk/makanan",
   "nutrients": [
     {"name": "energy", "amount": 0, "unit": "kkal"},
     {"name": "protein", "amount": 0, "unit": "g"},
@@ -25,8 +30,8 @@ Return ONLY JSON in this format:
     {"name": "sugar", "amount": 0, "unit": "g"},
     {"name": "sodium", "amount": 0, "unit": "mg"}
   ],
-  "nutrition_score": 0,
-  "health_analysis": "Analisis kesehatan dalam bahasa Indonesia yang ramah dan informatif.",
+  "nutrition_grade": "A" | "B" | "C" | "D" | "E",
+  "health_analysis": "Analisis kesehatan dalam Bahasa Indonesia.",
   "confidence_level": 0.0
 }
 `;
