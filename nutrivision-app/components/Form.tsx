@@ -172,12 +172,12 @@ export default function Form({ config }: { config: FormConfig }) {
             }
 
             const data = await response.json();
-            
+
             // Simpan user data ke localStorage jika ada (untuk login)
             if (data.user) {
-                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem("user", JSON.stringify(data.user));
             }
-            
+
             setSuccess(true);
             setFormData(initialFormData);
 
@@ -240,7 +240,7 @@ export default function Form({ config }: { config: FormConfig }) {
                                     value={formData[field.name]}
                                     onChange={handleChange}
                                     placeholder={field.placeholder}
-                                    className="w-full h-12 px-4 py-3 pr-12 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-300 text-gray-700 text-base font-normal leading-5 placeholder:text-gray-400 focus:outline-2 focus:outline-[#cbea7b] transition duration-200"
+                                    className="w-full h-12 px-4 py-3 pr-12 bg-white rounded-lg outline-1 -outline-offset-1 outline-gray-300 text-gray-700 text-base font-normal leading-5 placeholder:text-gray-400 focus:outline-2 focus:outline-[#cbea7b] transition duration-200"
                                 />
                                 <button
                                     type="button"
@@ -291,7 +291,7 @@ export default function Form({ config }: { config: FormConfig }) {
                                 value={formData[field.name]}
                                 onChange={handleChange}
                                 placeholder={field.placeholder}
-                                className="w-full h-12 px-4 py-3 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-300 text-gray-700 text-sm font-normal leading-5 placeholder:text-gray-400 focus:outline-2 focus:outline-[#cbea7b] transition duration-200"
+                                className="w-full h-12 px-4 py-3 bg-white rounded-lg outline-1 -outline-offset-1 outline-gray-300 text-gray-700 text-sm font-normal leading-5 placeholder:text-gray-400 focus:outline-2 focus:outline-[#cbea7b] transition duration-200"
                             />
                         )}
 

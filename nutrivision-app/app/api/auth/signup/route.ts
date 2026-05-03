@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import { queryDatabase } from '@/lib/db';
+import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import { queryDatabase } from "@/lib/db";
 
 interface SignupRequest {
     name: string;
@@ -17,8 +17,8 @@ export async function POST(request: NextRequest) {
         // Validasi input
         if (!body.name || !body.email || !body.password) {
             return NextResponse.json(
-                { message: 'Nama, email, dan password harus diisi' },
-                { status: 400 }
+                { message: "Nama, email, dan password harus diisi" },
+                { status: 400 },
             );
         }
 
@@ -26,27 +26,29 @@ export async function POST(request: NextRequest) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(body.email)) {
             return NextResponse.json(
-                { message: 'Format email tidak valid' },
-                { status: 400 }
+                { message: "Format email tidak valid" },
+                { status: 400 },
             );
         }
 
         // Validasi panjang password
         if (body.password.length < 8) {
             return NextResponse.json(
-                { message: 'Password minimal 8 karakter' },
-                { status: 400 }
+                { message: "Password minimal 8 karakter" },
+                { status: 400 },
             );
         }
 
         // Cek apakah email sudah terdaftar
-        const emailCheckQuery = 'SELECT id FROM users WHERE email = $1';
-        const emailCheckResult = await queryDatabase(emailCheckQuery, [body.email]);
+        const emailCheckQuery = "SELECT id FROM users WHERE email = $1";
+        const emailCheckResult = await queryDatabase(emailCheckQuery, [
+            body.email,
+        ]);
 
         if (emailCheckResult.rows.length > 0) {
             return NextResponse.json(
-                { message: 'Email sudah terdaftar' },
-                { status: 409 }
+                { message: "Email sudah terdaftar" },
+                { status: 409 },
             );
         }
 
@@ -72,7 +74,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(
             {
-                message: 'Akun berhasil dibuat',
+                message: "Akun berhasil dibuat",
                 user: {
                     id: user.id,
                     name: user.name,
@@ -81,22 +83,22 @@ export async function POST(request: NextRequest) {
                     created_at: user.created_at,
                 },
             },
-            { status: 201 }
+            { status: 201 },
         );
     } catch (error) {
-        console.error('Signup error:', error);
+        console.error("Signup error:", error);
 
         // Handle duplicate email error
-        if (error instanceof Error && error.message.includes('duplicate')) {
+        if (error instanceof Error && error.message.includes("duplicate")) {
             return NextResponse.json(
-                { message: 'Email sudah terdaftar' },
-                { status: 409 }
+                { message: "Email sudah terdaftar" },
+                { status: 409 },
             );
         }
 
         return NextResponse.json(
-            { message: 'Terjadi kesalahan pada server' },
-            { status: 500 }
+            { message: "Terjadi kesalahan pada server" },
+            { status: 500 },
         );
     }
 }
