@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
         let user;
 
         if (userResult.rows.length > 0) {
-            // User sudah ada, langsung login
+            // User sudah ada
             user = userResult.rows[0];
         } else {
             // User baru, create account dengan random password
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(
             {
-                message: 'Login dengan Google berhasil',
+                message: 'Signup dengan Google berhasil',
                 user: {
                     id: user.id,
                     name: user.name,
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
             { status: 200 }
         );
     } catch (error) {
-        console.error('Google auth error:', error);
+        console.error('Google signup error:', error);
 
         return NextResponse.json(
             { message: 'Terjadi kesalahan pada server' },

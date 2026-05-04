@@ -1,9 +1,45 @@
 'use client';
 
 import Image from 'next/image';
+import { useState } from 'react';
+import { useGoogleLogin } from '@react-oauth/google';
 import Form, { FormConfig } from '@/components/Form';
 
 export default function SignupPage() {
+    const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
+
+    const handleGoogleSignupSuccess = async (codeResponse: any) => {
+        setIsLoadingGoogle(true);
+        try {
+            // Kirim code ke backend untuk ditukar dengan token
+            const response = await fetch('/api/auth/google/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code: codeResponse.code }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error('Google signup error:', data.message);
+                return;
+            }
+
+            // Redirect ke dashboard
+            window.location.href = '/dashboard';
+        } catch (error) {
+            console.error('Google signup error:', error);
+        } finally {
+            setIsLoadingGoogle(false);
+        }
+    };
+
+    const googleSignup = useGoogleLogin({
+        onSuccess: handleGoogleSignupSuccess,
+        flow: 'auth-code',
+    });
     const signupFormConfig: FormConfig = {
         title: 'Sign Up',
         fields: [
@@ -53,9 +89,6 @@ export default function SignupPage() {
         successMessage: 'Akun berhasil dibuat! Redirecting ke login...',
         redirectTo: '/login',
         redirectDelay: 2000,
-        footerText: 'Sudah punya akun?',
-        footerLinkText: 'Log In',
-        footerLinkHref: '/login',
         customValidation: (formData) => {
             const errors: Record<string, string> = {};
             
@@ -75,6 +108,40 @@ export default function SignupPage() {
                     {/* Left Section - Form */}
                     <div className="flex flex-col justify-start items-start gap-10 w-full max-w-md">
                         <Form config={signupFormConfig} />
+
+                        {/* Divider */}
+                        <div className="w-full flex items-center gap-4">
+                            <div className="flex-1 h-px bg-gray-300"></div>
+                            <span className="text-gray-600 text-sm font-medium">atau daftar melalui</span>
+                            <div className="flex-1 h-px bg-gray-300"></div>
+                        </div>
+
+                        {/* Custom Google Signup Button */}
+                        <button
+                            onClick={() => googleSignup()}
+                            disabled={isLoadingGoogle}
+                            className="w-full h-12 px-4 py-3 bg-lime-100 border border-neutral-200 rounded-md inline-flex justify-center items-center gap-2 hover:bg-lime-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Image
+                                src="/images/icons/icons-google.svg"
+                                alt="Google"
+                                width={24}
+                                height={24}
+                                priority
+                            />
+                            <span className="text-neutral-800 text-lg font-semibold">Google</span>
+                        </button>
+
+                        {/* Log In Footer */}
+                        <div className="w-full text-center text-sm mt-4">
+                            <span className="text-gray-600">Sudah punya akun? </span>
+                            <a 
+                                href="/login" 
+                                className="font-semibold text-gray-800 hover:text-lime-600 transition-colors"
+                            >
+                                Log In
+                            </a>
+                        </div>
                     </div>
 
                     {/* Right Section - Image */}
