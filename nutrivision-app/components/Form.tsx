@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, FormEvent, ChangeEvent } from 'react';
-import Link from 'next/link';
+import { useState, FormEvent, ChangeEvent } from "react";
+import Link from "next/link";
 
 export interface FormField {
     name: string;
     label: string;
-    type: 'text' | 'email' | 'password' | 'tel' | 'number';
+    type: "text" | "email" | "password" | "tel" | "number";
     placeholder?: string;
     required?: boolean;
     validation?: (value: string) => string | null;
@@ -24,7 +24,9 @@ export interface FormConfig {
     footerText?: string;
     footerLinkText?: string;
     footerLinkHref?: string;
-    customValidation?: (formData: Record<string, string>) => Record<string, string>;
+    customValidation?: (
+        formData: Record<string, string>,
+    ) => Record<string, string>;
     showForgotPassword?: boolean;
     forgotPasswordHref?: string;
 }
@@ -40,23 +42,23 @@ interface FormErrors {
 const defaultValidation = {
     email: (value: string): string | null => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!value) return 'Email harus diisi';
-        if (!emailRegex.test(value)) return 'Format email tidak valid';
+        if (!value) return "Email harus diisi";
+        if (!emailRegex.test(value)) return "Format email tidak valid";
         return null;
     },
     text: (value: string): string | null => {
         if (!value.trim()) return null;
-        if (value.trim().length < 3) return 'Minimal 3 karakter';
+        if (value.trim().length < 3) return "Minimal 3 karakter";
         return null;
     },
     password: (value: string): string | null => {
-        if (!value) return 'Password harus diisi';
-        if (value.length < 8) return 'Password minimal 8 karakter';
+        if (!value) return "Password harus diisi";
+        if (value.length < 8) return "Password minimal 8 karakter";
         return null;
     },
     tel: (value: string): string | null => {
         if (!value.trim()) return null;
-        if (!/^[\d\s\-\+\(\)]+$/.test(value)) return 'Nomor tidak valid';
+        if (!/^[\d\s\-\+\(\)]+$/.test(value)) return "Nomor tidak valid";
         return null;
     },
 };
@@ -64,14 +66,16 @@ const defaultValidation = {
 export default function Form({ config }: { config: FormConfig }) {
     const initialFormData: FormData = {};
     config.fields.forEach((field) => {
-        initialFormData[field.name] = '';
+        initialFormData[field.name] = "";
     });
 
     const [formData, setFormData] = useState<FormData>(initialFormData);
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
-    const [showPasswordFields, setShowPasswordFields] = useState<Record<string, boolean>>({});
+    const [showPasswordFields, setShowPasswordFields] = useState<
+        Record<string, boolean>
+    >({});
 
     const validateForm = (): boolean => {
         const newErrors: FormErrors = {};
@@ -97,16 +101,16 @@ export default function Form({ config }: { config: FormConfig }) {
             }
 
             // Use default validation berdasarkan type
-            if (field.type === 'email') {
+            if (field.type === "email") {
                 const error = defaultValidation.email(value);
                 if (error) newErrors[field.name] = error;
-            } else if (field.type === 'password') {
+            } else if (field.type === "password") {
                 const error = defaultValidation.password(value);
                 if (error) newErrors[field.name] = error;
-            } else if (field.type === 'tel') {
+            } else if (field.type === "tel") {
                 const error = defaultValidation.tel(value);
                 if (error) newErrors[field.name] = error;
-            } else if (field.type === 'text') {
+            } else if (field.type === "text") {
                 const error = defaultValidation.text(value);
                 if (error) newErrors[field.name] = error;
             }
@@ -132,7 +136,7 @@ export default function Form({ config }: { config: FormConfig }) {
         if (errors[name]) {
             setErrors((prev) => ({
                 ...prev,
-                [name]: '',
+                [name]: "",
             }));
         }
     };
@@ -147,9 +151,9 @@ export default function Form({ config }: { config: FormConfig }) {
         setLoading(true);
         try {
             const response = await fetch(config.apiEndpoint, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify(formData),
             });
@@ -157,14 +161,21 @@ export default function Form({ config }: { config: FormConfig }) {
             if (!response.ok) {
                 const errorData = await response.json();
                 // Handle per-field errors atau error message
-                if (errorData.errors && typeof errorData.errors === 'object') {
+                if (errorData.errors && typeof errorData.errors === "object") {
                     setErrors(errorData.errors);
                 } else {
                     setErrors({
-                        submit: errorData.message || 'Gagal memproses form',
+                        submit: errorData.message || "Gagal memproses form",
                     });
                 }
                 return;
+            }
+
+            const data = await response.json();
+
+            // Simpan user data ke localStorage jika ada (untuk login)
+            if (data.user) {
+                localStorage.setItem("user", JSON.stringify(data.user));
             }
 
             setSuccess(true);
@@ -176,9 +187,9 @@ export default function Form({ config }: { config: FormConfig }) {
                     window.location.href = config.redirectTo!;
                 }, config.redirectDelay || 2000);
             }
-        } catch (error) {
+        } catch {
             setErrors({
-                submit: 'Terjadi kesalahan. Silakan coba lagi.',
+                submit: "Terjadi kesalahan. Silakan coba lagi.",
             });
         } finally {
             setLoading(false);
@@ -210,22 +221,26 @@ export default function Form({ config }: { config: FormConfig }) {
                             className="text-[#1a3129] text-base font-medium leading-6">
                             {field.label}
                             {field.required === false && (
-                                <span className="text-neutral-500 text-sm ml-2">(opsional)</span>
+                                <span className="text-neutral-500 text-sm ml-2">
+                                    (opsional)
+                                </span>
                             )}
                         </label>
 
-                        {field.type === 'password' ? (
+                        {field.type === "password" ? (
                             <div className="relative">
                                 <input
                                     id={field.name}
                                     type={
-                                        showPasswordFields[field.name] ? 'text' : 'password'
+                                        showPasswordFields[field.name]
+                                            ? "text"
+                                            : "password"
                                     }
                                     name={field.name}
                                     value={formData[field.name]}
                                     onChange={handleChange}
                                     placeholder={field.placeholder}
-                                    className="w-full h-12 px-4 py-3 pr-12 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-300 text-gray-700 text-base font-normal leading-5 placeholder:text-gray-400 focus:outline-2 focus:outline-[#cbea7b] transition duration-200"
+                                    className="w-full h-12 px-4 py-3 pr-12 bg-white rounded-lg outline-1 -outline-offset-1 outline-gray-300 text-gray-700 text-base font-normal leading-5 placeholder:text-gray-400 focus:outline-2 focus:outline-[#cbea7b] transition duration-200"
                                 />
                                 <button
                                     type="button"
@@ -276,7 +291,7 @@ export default function Form({ config }: { config: FormConfig }) {
                                 value={formData[field.name]}
                                 onChange={handleChange}
                                 placeholder={field.placeholder}
-                                className="w-full h-12 px-4 py-3 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-300 text-gray-700 text-sm font-normal leading-5 placeholder:text-gray-400 focus:outline-2 focus:outline-[#cbea7b] transition duration-200"
+                                className="w-full h-12 px-4 py-3 bg-white rounded-lg outline-1 -outline-offset-1 outline-gray-300 text-gray-700 text-sm font-normal leading-5 placeholder:text-gray-400 focus:outline-2 focus:outline-[#cbea7b] transition duration-200"
                             />
                         )}
 
@@ -303,7 +318,9 @@ export default function Form({ config }: { config: FormConfig }) {
             {/* Error atau Success Messages */}
             {errors.submit && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-                    <span className="text-red-700 text-sm font-medium">{errors.submit}</span>
+                    <span className="text-red-700 text-sm font-medium">
+                        {errors.submit}
+                    </span>
                 </div>
             )}
 
@@ -321,23 +338,25 @@ export default function Form({ config }: { config: FormConfig }) {
                 disabled={loading}
                 className="w-full px-4 py-4 bg-[#cbea7b] rounded-lg inline-flex justify-center items-center gap-2 hover:bg-[#b8d96a] disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 mt-8">
                 <span className="text-neutral-800 text-base font-semibold leading-6">
-                    {loading ? 'Memproses...' : config.submitButtonLabel}
+                    {loading ? "Memproses..." : config.submitButtonLabel}
                 </span>
             </button>
 
             {/* Footer Link */}
-            {config.footerText && config.footerLinkText && config.footerLinkHref && (
-                <div className="flex justify-center items-center gap-1 pt-4">
-                    <span className="text-gray-600 text-md font-normal leading-6">
-                        {config.footerText}
-                    </span>
-                    <Link
-                        href={config.footerLinkHref}
-                        className="text-[#1a3129] text-md font-medium leading-6 hover:underline transition">
-                        {config.footerLinkText}
-                    </Link>
-                </div>
-            )}
+            {config.footerText &&
+                config.footerLinkText &&
+                config.footerLinkHref && (
+                    <div className="flex justify-center items-center gap-1 pt-4">
+                        <span className="text-gray-600 text-md font-normal leading-6">
+                            {config.footerText}
+                        </span>
+                        <Link
+                            href={config.footerLinkHref}
+                            className="text-[#1a3129] text-md font-medium leading-6 hover:underline transition">
+                            {config.footerLinkText}
+                        </Link>
+                    </div>
+                )}
         </form>
     );
 }

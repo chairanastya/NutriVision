@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from 'next/image';
 import { useState } from 'react';
@@ -42,30 +42,30 @@ export default function LoginPage() {
     });
 
     const loginFormConfig: FormConfig = {
-        title: 'Log In',
+        title: "Log In",
         fields: [
             {
-                name: 'email',
-                label: 'Email',
-                type: 'email',
-                placeholder: 'abc@gmail.com',
+                name: "email",
+                label: "Email",
+                type: "email",
+                placeholder: "abc@gmail.com",
                 required: true,
             },
             {
-                name: 'password',
-                label: 'Password',
-                type: 'password',
-                placeholder: 'Masukkan password',
+                name: "password",
+                label: "Password",
+                type: "password",
+                placeholder: "Masukkan password",
                 required: true,
             },
         ],
-        submitButtonLabel: 'Log In',
-        apiEndpoint: '/api/auth/login',
-        successMessage: 'Login berhasil! Redirecting ke dashboard...',
-        redirectTo: '/dashboard',
+        submitButtonLabel: "Log In",
+        apiEndpoint: "/api/auth/login",
+        successMessage: "Login berhasil! Redirecting ke dashboard...",
+        redirectTo: "/dashboard",
         redirectDelay: 2000,
         showForgotPassword: true,
-        forgotPasswordHref: '/forgot-password',
+        forgotPasswordHref: "/forgot-password",
     };
 
     return (

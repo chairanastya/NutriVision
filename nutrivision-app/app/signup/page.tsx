@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from 'next/image';
 import { useState } from 'react';
@@ -41,62 +41,63 @@ export default function SignupPage() {
         flow: 'auth-code',
     });
     const signupFormConfig: FormConfig = {
-        title: 'Sign Up',
+        title: "Sign Up",
         fields: [
             {
-                name: 'name',
-                label: 'Nama',
-                type: 'text',
-                placeholder: 'Masukkan nama lengkap',
+                name: "name",
+                label: "Nama",
+                type: "text",
+                placeholder: "Masukkan nama lengkap",
                 required: true,
                 validation: (value) => {
-                    if (!value.trim()) return 'Nama harus diisi';
-                    if (value.trim().length < 3) return 'Nama minimal 3 karakter';
+                    if (!value.trim()) return "Nama harus diisi";
+                    if (value.trim().length < 3)
+                        return "Nama minimal 3 karakter";
                     return null;
                 },
             },
             {
-                name: 'phone_number',
-                label: 'Nomor Handphone',
-                type: 'tel',
-                placeholder: 'Masukkan nomor handphone',
+                name: "phone_number",
+                label: "Nomor Handphone",
+                type: "tel",
+                placeholder: "Masukkan nomor handphone",
                 required: false,
             },
             {
-                name: 'email',
-                label: 'Email',
-                type: 'email',
-                placeholder: 'abc@gmail.com',
+                name: "email",
+                label: "Email",
+                type: "email",
+                placeholder: "abc@gmail.com",
                 required: true,
             },
             {
-                name: 'password',
-                label: 'Password',
-                type: 'password',
-                placeholder: 'Masukkan password',
+                name: "password",
+                label: "Password",
+                type: "password",
+                placeholder: "Masukkan password",
                 required: true,
             },
             {
-                name: 'confirmPassword',
-                label: 'Konfirmasi Password',
-                type: 'password',
-                placeholder: 'Ulangi password',
+                name: "confirmPassword",
+                label: "Konfirmasi Password",
+                type: "password",
+                placeholder: "Ulangi password",
                 required: true,
             },
         ],
-        submitButtonLabel: 'Daftar',
-        apiEndpoint: '/api/auth/signup',
-        successMessage: 'Akun berhasil dibuat! Redirecting ke login...',
-        redirectTo: '/login',
+        submitButtonLabel: "Daftar",
+        apiEndpoint: "/api/auth/signup",
+        successMessage: "Akun berhasil dibuat! Redirecting ke login...",
+        redirectTo: "/login",
         redirectDelay: 2000,
         customValidation: (formData) => {
             const errors: Record<string, string> = {};
-            
+
             // Validasi jika password tidak cocok
             if (formData.password !== formData.confirmPassword) {
-                errors.confirmPassword = 'Password tidak cocok';
+                errors.confirmPassword = "Password tidak cocok";
             }
-            
+
             return errors;
         },
     };
