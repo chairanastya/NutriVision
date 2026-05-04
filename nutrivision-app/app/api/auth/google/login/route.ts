@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtDecode } from 'jwt-decode';
 import { queryDatabase } from '@/lib/db';
+import { createSessionToken, SESSION_COOKIE_NAME } from '@/lib/session';
 import bcrypt from 'bcryptjs';
 
 interface GoogleToken {
@@ -98,7 +99,15 @@ export async function POST(request: NextRequest) {
             user = insertResult.rows[0];
         }
 
-        return NextResponse.json(
+        // Create session token
+        const sessionToken = await createSessionToken({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        });
+
+        // Set session cookie
+        const response = NextResponse.json(
             {
                 message: 'Login dengan Google berhasil',
                 user: {
@@ -111,6 +120,18 @@ export async function POST(request: NextRequest) {
             },
             { status: 200 }
         );
+
+        response.cookies.set({
+            name: SESSION_COOKIE_NAME,
+            value: sessionToken,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+        });
+
+        return response;
     } catch (error) {
         console.error('Google auth error:', error);
 
