@@ -1,9 +1,46 @@
 "use client";
 
-import Image from "next/image";
-import Form, { FormConfig } from "@/components/Form";
+import Image from 'next/image';
+import { useState } from 'react';
+import { useGoogleLogin } from '@react-oauth/google';
+import Form, { FormConfig } from '@/components/Form';
 
 export default function LoginPage() {
+    const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
+
+    const handleGoogleLoginSuccess = async (codeResponse: any) => {
+        setIsLoadingGoogle(true);
+        try {
+            // Kirim code ke backend untuk ditukar dengan token
+            const response = await fetch('/api/auth/google/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code: codeResponse.code }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error('Google login error:', data.message);
+                return;
+            }
+
+            // Redirect ke dashboard
+            window.location.href = '/dashboard';
+        } catch (error) {
+            console.error('Google login error:', error);
+        } finally {
+            setIsLoadingGoogle(false);
+        }
+    };
+
+    const googleLogin = useGoogleLogin({
+        onSuccess: handleGoogleLoginSuccess,
+        flow: 'auth-code',
+    });
+
     const loginFormConfig: FormConfig = {
         title: "Log In",
         fields: [
@@ -27,9 +64,6 @@ export default function LoginPage() {
         successMessage: "Login berhasil! Redirecting ke dashboard...",
         redirectTo: "/dashboard",
         redirectDelay: 2000,
-        footerText: "Belum punya akun?",
-        footerLinkText: "Daftar",
-        footerLinkHref: "/signup",
         showForgotPassword: true,
         forgotPasswordHref: "/forgot-password",
     };
@@ -41,6 +75,40 @@ export default function LoginPage() {
                     {/* Left Section - Form */}
                     <div className="flex flex-col justify-start items-start gap-10 w-full max-w-md">
                         <Form config={loginFormConfig} />
+                        
+                        {/* Divider */}
+                        <div className="w-full flex items-center gap-4">
+                            <div className="flex-1 h-px bg-gray-300"></div>
+                            <span className="text-gray-600 text-sm font-medium">atau login melalui</span>
+                            <div className="flex-1 h-px bg-gray-300"></div>
+                        </div>
+
+                        {/* Custom Google Login Button */}
+                        <button
+                            onClick={() => googleLogin()}
+                            disabled={isLoadingGoogle}
+                            className="w-full h-12 px-4 py-3 bg-lime-100 border border-neutral-200 rounded-md inline-flex justify-center items-center gap-2 hover:bg-lime-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Image
+                                src="/images/icons/icons-google.svg"
+                                alt="Google"
+                                width={24}
+                                height={24}
+                                priority
+                            />
+                            <span className="text-neutral-800 text-lg font-semibold">Google</span>
+                        </button>
+
+                        {/* Sign Up Footer */}
+                        <div className="w-full text-center text-sm mt-4">
+                            <span className="text-gray-600">Belum punya akun? </span>
+                            <a 
+                                href="/signup" 
+                                className="font-semibold text-gray-800 hover:text-lime-600 transition-colors"
+                            >
+                                Daftar
+                            </a>
+                        </div>
                     </div>
 
                     {/* Right Section - Image */}
