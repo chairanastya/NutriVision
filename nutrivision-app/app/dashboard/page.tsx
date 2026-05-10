@@ -1316,7 +1316,7 @@ export default function Dashboard() {
 
             {/* Product Detail Modal */}
             {selectedProduct && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
                         {/* Modal Header */}
                         <div className="sticky top-0 z-20 bg-linear-to-r from-[#2d6a3e] to-[#3d7d4a] p-6 flex items-center justify-between shrink-0 shadow-md">
