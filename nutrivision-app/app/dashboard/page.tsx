@@ -577,9 +577,12 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        {/* --- Section Header dengan Tombol Edit --- */}
-                        <div className="flex items-center justify-between m-4">
+                    {/* --- Status Kesehatan Section --- */}
+                    <div className="p-6 md:p-8 bg-lime-50 rounded-[10px] outline-1 -outline-offset-1 outline-lime-100 flex flex-col gap-4 mb-8">
+                        {/* Section Header dengan Tombol Edit */}
+                        <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <span className="w-2 h-6 bg-[#2d6a3e] rounded-full"></span>
                                 <h2 className="text-xl font-bold text-[#1a3129]">
@@ -595,7 +598,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* Grid 3 Kartu (Profil Fisik, Riwayat Medis, Target) */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                             {/* Card 1: Profil Fisik */}
                             <div className="p-5 bg-white rounded-[10px] border border-lime-200 shadow-sm flex flex-col gap-3">
                                 <div className="flex items-center gap-2 mb-1">
@@ -853,17 +856,11 @@ export default function Dashboard() {
                                     ) : null}
                                 </div>
                             </div>
-                            <MedForm
-                                isOpen={isModalOpen}
-                                onClose={() => setIsModalOpen(false)}
-                                onSaved={() => {
-                                    fetchDashboardData();
-                                }}
-                            />
                         </div>
+                    </div>
 
-                        {/* Main Content Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[4fr_5fr_3fr] gap-4 md:gap-6">
+                    {/* Main Content Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[4fr_5fr_3fr] gap-4 md:gap-6 mb-8">
                             {/* Left Column - Calorie Daily */}
                             <div className="p-6 md:p-8 bg-lime-50 rounded-[10px] outline-1 -outline-offset-1 outline-lime-100 flex flex-col gap-4">
                                 <div className="flex items-center justify-between">
@@ -1307,8 +1304,15 @@ export default function Dashboard() {
                             </div>
                         </div>
                     </div>
+
+                    <MedForm
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        onSaved={() => {
+                            fetchDashboardData();
+                        }}
+                    />
                 </div>
-            </div>
 
             {/* Product Detail Modal */}
             {selectedProduct && (
