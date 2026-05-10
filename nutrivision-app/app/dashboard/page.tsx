@@ -1063,7 +1063,9 @@ export default function Dashboard() {
                                             pernah kamu scan
                                         </p>
                                     </div>
-                                    <button className="px-3 py-1 bg-[#cbea7b] text-black rounded-lg text-xs font-semibold hover:bg-[#b8d96a] transition-colors whitespace-nowrap">
+                                    <button 
+                                        onClick={() => router.push("/scan-history")}
+                                        className="px-3 py-1 bg-[#cbea7b] text-black rounded-lg text-xs font-semibold hover:bg-[#b8d96a] transition-colors whitespace-nowrap">
                                         Lihat Semua
                                     </button>
                                 </div>
