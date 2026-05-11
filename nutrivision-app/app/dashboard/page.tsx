@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Camera } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Footer from "@/components/Footer";
 import MedForm from "@/components/user/MedForm";
 
@@ -25,6 +26,7 @@ interface Scan {
     product_id: number;
     product_name: string;
     product_brand: string | null;
+    image_path: string | null;
     nutrition_score: number;
     scanned_at: string;
 }
@@ -861,460 +863,455 @@ export default function Dashboard() {
 
                     {/* Main Content Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[4fr_5fr_3fr] gap-4 md:gap-6 mb-8">
-                            {/* Left Column - Calorie Daily */}
-                            <div className="p-6 md:p-8 bg-lime-50 rounded-[10px] outline-1 -outline-offset-1 outline-lime-100 flex flex-col gap-4">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-2 h-2 bg-green-600 rounded-full"></span>
-                                        <h3 className="font-semibold text-[#1a3129]">
-                                            Kalori Harian
-                                        </h3>
-                                    </div>
-                                    <span className="text-xs text-gray-400">
-                                        {loading
-                                            ? "-"
-                                            : Math.round(
-                                                  (data?.healthProfile
-                                                      ?.daily_calories_target ||
-                                                      2000) -
-                                                      (data?.dailyStats
-                                                          ?.total_calories ||
-                                                          0),
-                                              )}{" "}
-                                        kcal tersisa
-                                    </span>
+                        {/* Left Column - Calorie Daily */}
+                        <div className="p-6 md:p-8 bg-lime-50 rounded-[10px] outline-1 -outline-offset-1 outline-lime-100 flex flex-col gap-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 bg-green-600 rounded-full"></span>
+                                    <h3 className="font-semibold text-[#1a3129]">
+                                        Kalori Harian
+                                    </h3>
                                 </div>
-
-                                <div className="flex justify-center">
-                                    <div className="relative w-28 h-28">
-                                        <svg
-                                            className="transform -rotate-90 w-full h-full"
-                                            viewBox="0 0 36 36">
-                                            <circle
-                                                cx="18"
-                                                cy="18"
-                                                r="15.5"
-                                                fill="none"
-                                                stroke="#e5e7eb"
-                                                strokeWidth="2"
-                                            />
-                                            <circle
-                                                cx="18"
-                                                cy="18"
-                                                r="15.5"
-                                                fill="none"
-                                                stroke="#cbea7b"
-                                                strokeWidth="2"
-                                                strokeDasharray={`${(loading ? 0 : ((data?.dailyStats?.total_calories || 0) / (data?.healthProfile?.daily_calories_target || 2000)) * 100) * 0.9735} 100`}
-                                                strokeLinecap="round"
-                                            />
-                                        </svg>
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                                            <div className="text-2xl font-bold text-[#1a3129]">
-                                                {loading
-                                                    ? "-"
-                                                    : Math.round(
-                                                          data?.dailyStats
-                                                              ?.total_calories ||
-                                                              0,
-                                                      )}
-                                            </div>
-                                            <div className="text-xs text-[#1a3129] opacity-70">
-                                                kkal
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <p className="text-sm text-[#1a3129] opacity-70 text-center">
+                                <span className="text-xs text-gray-400">
                                     {loading
                                         ? "-"
                                         : Math.round(
-                                              ((data?.dailyStats
-                                                  ?.total_calories || 0) /
-                                                  (data?.healthProfile
-                                                      ?.daily_calories_target ||
-                                                      2000)) *
-                                                  100,
-                                          )}
-                                    % dari target
-                                </p>
+                                              (data?.healthProfile
+                                                  ?.daily_calories_target ||
+                                                  2000) -
+                                                  (data?.dailyStats
+                                                      ?.total_calories || 0),
+                                          )}{" "}
+                                    kcal tersisa
+                                </span>
+                            </div>
 
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-lg shrink-0">
-                                            🥚
-                                        </span>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <span className="text-sm font-medium text-[#1a3129]">
-                                                    Protein
-                                                </span>
-                                                <span className="text-sm text-[#1a3129] opacity-70">
-                                                    {loading
-                                                        ? "-/-"
-                                                        : `${Math.round(data?.dailyStats?.macronutrients?.protein?.total || 0)}/${data?.dailyStats?.macronutrients?.protein?.limit || 80}g`}
-                                                </span>
-                                            </div>
-                                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                                                <div
-                                                    className="bg-orange-500 h-1.5 rounded-full"
-                                                    style={{
-                                                        width: loading
-                                                            ? "0%"
-                                                            : `${Math.min(100, ((data?.dailyStats?.macronutrients?.protein?.total || 0) / (data?.dailyStats?.macronutrients?.protein?.limit || 80)) * 100)}%`,
-                                                    }}></div>
-                                            </div>
+                            <div className="flex justify-center">
+                                <div className="relative w-28 h-28">
+                                    <svg
+                                        className="transform -rotate-90 w-full h-full"
+                                        viewBox="0 0 36 36">
+                                        <circle
+                                            cx="18"
+                                            cy="18"
+                                            r="15.5"
+                                            fill="none"
+                                            stroke="#e5e7eb"
+                                            strokeWidth="2"
+                                        />
+                                        <circle
+                                            cx="18"
+                                            cy="18"
+                                            r="15.5"
+                                            fill="none"
+                                            stroke="#cbea7b"
+                                            strokeWidth="2"
+                                            strokeDasharray={`${(loading ? 0 : ((data?.dailyStats?.total_calories || 0) / (data?.healthProfile?.daily_calories_target || 2000)) * 100) * 0.9735} 100`}
+                                            strokeLinecap="round"
+                                        />
+                                    </svg>
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                                        <div className="text-2xl font-bold text-[#1a3129]">
+                                            {loading
+                                                ? "-"
+                                                : Math.round(
+                                                      data?.dailyStats
+                                                          ?.total_calories || 0,
+                                                  )}
                                         </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-lg shrink-0">
-                                            🌽
-                                        </span>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <span className="text-sm font-medium text-[#1a3129]">
-                                                    Karbohidrat
-                                                </span>
-                                                <span className="text-sm text-[#1a3129] opacity-70">
-                                                    {loading
-                                                        ? "-/-"
-                                                        : `${Math.round(data?.dailyStats?.macronutrients?.carbs?.total || 0)}/${data?.dailyStats?.macronutrients?.carbs?.limit || 250}g`}
-                                                </span>
-                                            </div>
-                                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                                                <div
-                                                    className="bg-blue-500 h-1.5 rounded-full"
-                                                    style={{
-                                                        width: loading
-                                                            ? "0%"
-                                                            : `${Math.min(100, ((data?.dailyStats?.macronutrients?.carbs?.total || 0) / (data?.dailyStats?.macronutrients?.carbs?.limit || 250)) * 100)}%`,
-                                                    }}></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-lg shrink-0">
-                                            🥑
-                                        </span>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <span className="text-sm font-medium text-[#1a3129]">
-                                                    Lemak
-                                                </span>
-                                                <span className="text-sm text-[#1a3129] opacity-70">
-                                                    {loading
-                                                        ? "-/-"
-                                                        : `${Math.round(data?.dailyStats?.macronutrients?.fat?.total || 0)}/${data?.dailyStats?.macronutrients?.fat?.limit || 55}g`}
-                                                </span>
-                                            </div>
-                                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                                                <div
-                                                    className="bg-red-500 h-1.5 rounded-full"
-                                                    style={{
-                                                        width: loading
-                                                            ? "0%"
-                                                            : `${Math.min(100, ((data?.dailyStats?.macronutrients?.fat?.total || 0) / (data?.dailyStats?.macronutrients?.fat?.limit || 55)) * 100)}%`,
-                                                    }}></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-lg shrink-0">
-                                            💚
-                                        </span>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <span className="text-sm font-medium text-[#1a3129]">
-                                                    Serat
-                                                </span>
-                                                <span className="text-sm text-[#1a3129] opacity-70">
-                                                    {loading
-                                                        ? "-/-"
-                                                        : `${Math.round(data?.dailyStats?.macronutrients?.fiber?.total || 0)}/${data?.dailyStats?.macronutrients?.fiber?.limit || 25}g`}
-                                                </span>
-                                            </div>
-                                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                                                <div
-                                                    className="bg-green-500 h-1.5 rounded-full"
-                                                    style={{
-                                                        width: loading
-                                                            ? "0%"
-                                                            : `${Math.min(100, ((data?.dailyStats?.macronutrients?.fiber?.total || 0) / (data?.dailyStats?.macronutrients?.fiber?.limit || 25)) * 100)}%`,
-                                                    }}></div>
-                                            </div>
+                                        <div className="text-xs text-[#1a3129] opacity-70">
+                                            kkal
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Middle Column - Riwayat Scan */}
-                            <div className="p-6 md:p-8 bg-lime-50 rounded-[10px] outline-1 -outline-offset-1 outline-lime-100 flex flex-col gap-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="font-semibold text-[#1a3129]">
-                                            Riwayat Scan
-                                        </h3>
-                                        <p className="text-xs text-[#1a3129] opacity-60 mt-1">
-                                            Ringkasan analisis produk yang
-                                            pernah kamu scan
-                                        </p>
+                            <p className="text-sm text-[#1a3129] opacity-70 text-center">
+                                {loading
+                                    ? "-"
+                                    : Math.round(
+                                          ((data?.dailyStats?.total_calories ||
+                                              0) /
+                                              (data?.healthProfile
+                                                  ?.daily_calories_target ||
+                                                  2000)) *
+                                              100,
+                                      )}
+                                % dari target
+                            </p>
+
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-lg shrink-0">🥚</span>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-sm font-medium text-[#1a3129]">
+                                                Protein
+                                            </span>
+                                            <span className="text-sm text-[#1a3129] opacity-70">
+                                                {loading
+                                                    ? "-/-"
+                                                    : `${Math.round(data?.dailyStats?.macronutrients?.protein?.total || 0)}/${data?.dailyStats?.macronutrients?.protein?.limit || 80}g`}
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                            <div
+                                                className="bg-orange-500 h-1.5 rounded-full"
+                                                style={{
+                                                    width: loading
+                                                        ? "0%"
+                                                        : `${Math.min(100, ((data?.dailyStats?.macronutrients?.protein?.total || 0) / (data?.dailyStats?.macronutrients?.protein?.limit || 80)) * 100)}%`,
+                                                }}></div>
+                                        </div>
                                     </div>
-                                    <button 
-                                        onClick={() => router.push("/scan-history")}
-                                        className="px-3 py-1 bg-[#cbea7b] text-black rounded-lg text-xs font-semibold hover:bg-[#b8d96a] transition-colors whitespace-nowrap">
-                                        Lihat Semua
-                                    </button>
                                 </div>
 
-                                <div className="space-y-3">
-                                    {loading ? (
-                                        <div className="text-center py-8 text-[#1a3129] opacity-60">
-                                            Loading...
+                                <div className="flex items-center gap-3">
+                                    <span className="text-lg shrink-0">🌽</span>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-sm font-medium text-[#1a3129]">
+                                                Karbohidrat
+                                            </span>
+                                            <span className="text-sm text-[#1a3129] opacity-70">
+                                                {loading
+                                                    ? "-/-"
+                                                    : `${Math.round(data?.dailyStats?.macronutrients?.carbs?.total || 0)}/${data?.dailyStats?.macronutrients?.carbs?.limit || 250}g`}
+                                            </span>
                                         </div>
-                                    ) : data?.scans && data.scans.length > 0 ? (
-                                        data.scans.map((scan, idx) => {
-                                            const emoji = [
-                                                "🥣",
-                                                "🍫",
-                                                "🥐",
-                                                "🍕",
-                                                "🥗",
-                                                "🍎",
-                                            ][idx % 6];
-                                            const gradients = [
-                                                "from-blue-100 to-blue-50",
-                                                "from-amber-100 to-amber-50",
-                                                "from-orange-100 to-orange-50",
-                                                "from-red-100 to-red-50",
-                                                "from-green-100 to-green-50",
-                                                "from-purple-100 to-purple-50",
-                                            ][idx % 6];
-
-                                            return (
-                                                <div
-                                                    key={scan.id}
-                                                    onClick={() =>
-                                                        fetchProductDetail(scan)
-                                                    }
-                                                    className="flex gap-3 p-3 bg-white rounded-lg border border-lime-100 hover:shadow-md hover:bg-lime-50 transition-all cursor-pointer">
-                                                    <div
-                                                        className={`w-16 h-16 bg-linear-to-br ${gradients} rounded-lg flex items-center justify-center shrink-0 text-2xl`}>
-                                                        {emoji}
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <h4 className="font-semibold text-[#1a3129] text-sm">
-                                                            {scan.product_name}
-                                                            {scan.product_brand &&
-                                                                ` (${scan.product_brand})`}
-                                                        </h4>
-                                                        <p className="text-xs text-[#1a3129] opacity-60 mb-2">
-                                                            {new Date(
-                                                                scan.scanned_at,
-                                                            ).toLocaleDateString(
-                                                                "id-ID",
-                                                            )}
-                                                        </p>
-                                                        <div className="flex gap-1">
-                                                            {[...Array(6)].map(
-                                                                (_, i) => {
-                                                                    const filledBars =
-                                                                        Math.ceil(
-                                                                            (scan.nutrition_score /
-                                                                                100) *
-                                                                                6,
-                                                                        );
-                                                                    return (
-                                                                        <div
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                            className={`h-1 rounded-full flex-1 ${
-                                                                                i <
-                                                                                filledBars
-                                                                                    ? "bg-lime-400"
-                                                                                    : "bg-gray-200"
-                                                                            }`}
-                                                                        />
-                                                                    );
-                                                                },
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center shrink-0">
-                                                        <span
-                                                            className={`inline-flex items-center justify-center w-10 h-10 text-white text-sm font-bold rounded ${
-                                                                scan.nutrition_score >=
-                                                                80
-                                                                    ? "bg-green-600"
-                                                                    : scan.nutrition_score >=
-                                                                        60
-                                                                      ? "bg-green-500"
-                                                                      : scan.nutrition_score >=
-                                                                          40
-                                                                        ? "bg-yellow-500"
-                                                                        : scan.nutrition_score >=
-                                                                            20
-                                                                          ? "bg-orange-500"
-                                                                          : "bg-red-500"
-                                                            }`}>
-                                                            {scan.nutrition_score >=
-                                                            80
-                                                                ? "A"
-                                                                : scan.nutrition_score >=
-                                                                    60
-                                                                  ? "B"
-                                                                  : scan.nutrition_score >=
-                                                                      40
-                                                                    ? "C"
-                                                                    : scan.nutrition_score >=
-                                                                        20
-                                                                      ? "D"
-                                                                      : "E"}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })
-                                    ) : (
-                                        <div className="text-center py-8 text-[#1a3129] opacity-60">
-                                            Belum ada scan hari ini
+                                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                            <div
+                                                className="bg-blue-500 h-1.5 rounded-full"
+                                                style={{
+                                                    width: loading
+                                                        ? "0%"
+                                                        : `${Math.min(100, ((data?.dailyStats?.macronutrients?.carbs?.total || 0) / (data?.dailyStats?.macronutrients?.carbs?.limit || 250)) * 100)}%`,
+                                                }}></div>
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
 
-                                <button className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors">
-                                    <Camera size={16} />
-                                    Scan Produk Baru
+                                <div className="flex items-center gap-3">
+                                    <span className="text-lg shrink-0">🥑</span>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-sm font-medium text-[#1a3129]">
+                                                Lemak
+                                            </span>
+                                            <span className="text-sm text-[#1a3129] opacity-70">
+                                                {loading
+                                                    ? "-/-"
+                                                    : `${Math.round(data?.dailyStats?.macronutrients?.fat?.total || 0)}/${data?.dailyStats?.macronutrients?.fat?.limit || 55}g`}
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                            <div
+                                                className="bg-red-500 h-1.5 rounded-full"
+                                                style={{
+                                                    width: loading
+                                                        ? "0%"
+                                                        : `${Math.min(100, ((data?.dailyStats?.macronutrients?.fat?.total || 0) / (data?.dailyStats?.macronutrients?.fat?.limit || 55)) * 100)}%`,
+                                                }}></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <span className="text-lg shrink-0">💚</span>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-sm font-medium text-[#1a3129]">
+                                                Serat
+                                            </span>
+                                            <span className="text-sm text-[#1a3129] opacity-70">
+                                                {loading
+                                                    ? "-/-"
+                                                    : `${Math.round(data?.dailyStats?.macronutrients?.fiber?.total || 0)}/${data?.dailyStats?.macronutrients?.fiber?.limit || 25}g`}
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                            <div
+                                                className="bg-green-500 h-1.5 rounded-full"
+                                                style={{
+                                                    width: loading
+                                                        ? "0%"
+                                                        : `${Math.min(100, ((data?.dailyStats?.macronutrients?.fiber?.total || 0) / (data?.dailyStats?.macronutrients?.fiber?.limit || 25)) * 100)}%`,
+                                                }}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Middle Column - Riwayat Scan */}
+                        <div className="p-6 md:p-8 bg-lime-50 rounded-[10px] outline-1 -outline-offset-1 outline-lime-100 flex flex-col gap-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="font-semibold text-[#1a3129]">
+                                        Riwayat Scan
+                                    </h3>
+                                    <p className="text-xs text-[#1a3129] opacity-60 mt-1">
+                                        Ringkasan analisis produk yang pernah
+                                        kamu scan
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => router.push("/scan-history")}
+                                    className="px-3 py-1 bg-[#cbea7b] text-black rounded-lg text-xs font-semibold hover:bg-[#b8d96a] transition-colors whitespace-nowrap">
+                                    Lihat Semua
                                 </button>
                             </div>
 
-                            {/* Right Column - Hidrasi, Energi & Mood, Aktivitas */}
-                            <div className="lg:col-span-1 space-y-6">
-                                {/* Nutri-Score 5-Day Trend */}
-                                {!loading &&
-                                    data?.nutriScoreTrend &&
-                                    data.nutriScoreTrend.length > 0 && (
-                                        <div className="p-6 md:p-8 bg-lime-50 rounded-[10px] outline-1 -outline-offset-1 outline-lime-100 flex flex-col gap-4">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                                                    <h3 className="font-semibold text-[#1a3129]">
-                                                        Nutri-Score 5 Hari
-                                                    </h3>
+                            <div className="space-y-3">
+                                {loading ? (
+                                    <div className="text-center py-8 text-[#1a3129] opacity-60">
+                                        Loading...
+                                    </div>
+                                ) : data?.scans && data.scans.length > 0 ? (
+                                    data.scans.map((scan, idx) => {
+                                        const emoji = [
+                                            "🥣",
+                                            "🍫",
+                                            "🥐",
+                                            "🍕",
+                                            "🥗",
+                                            "🍎",
+                                        ][idx % 6];
+                                        const gradients = [
+                                            "from-blue-100 to-blue-50",
+                                            "from-amber-100 to-amber-50",
+                                            "from-orange-100 to-orange-50",
+                                            "from-red-100 to-red-50",
+                                            "from-green-100 to-green-50",
+                                            "from-purple-100 to-purple-50",
+                                        ][idx % 6];
+
+                                        return (
+                                            <div
+                                                key={scan.id}
+                                                onClick={() =>
+                                                    fetchProductDetail(scan)
+                                                }
+                                                className="flex gap-3 p-3 bg-white rounded-lg border border-lime-100 hover:shadow-md hover:bg-lime-50 transition-all cursor-pointer">
+                                                <div
+                                                    className={`w-16 h-16 bg-linear-to-br ${gradients} rounded-lg shrink-0 overflow-hidden relative flex items-center justify-center text-2xl`}>
+                                                    {scan.image_path ? (
+                                                        <Image
+                                                            src={
+                                                                scan.image_path
+                                                            }
+                                                            alt={
+                                                                scan.product_name
+                                                            }
+                                                            fill
+                                                            sizes="64px"
+                                                            className="object-cover"
+                                                        />
+                                                    ) : (
+                                                        emoji
+                                                    )}
                                                 </div>
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-xs text-[#1a3129] opacity-70">
-                                                        Rata-rata:{" "}
-                                                        {Math.round(
-                                                            data.nutriScoreTrend.reduce(
-                                                                (sum, t) =>
-                                                                    sum +
-                                                                    t.score,
-                                                                0,
-                                                            ) /
-                                                                data
-                                                                    .nutriScoreTrend
-                                                                    .length,
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-semibold text-[#1a3129] text-sm">
+                                                        {scan.product_name}
+                                                        {scan.product_brand &&
+                                                            ` (${scan.product_brand})`}
+                                                    </h4>
+                                                    <p className="text-xs text-[#1a3129] opacity-60 mb-2">
+                                                        {new Date(
+                                                            scan.scanned_at,
+                                                        ).toLocaleDateString(
+                                                            "id-ID",
                                                         )}
-                                                    </span>
-                                                    {(() => {
-                                                        const avgScore =
-                                                            data.nutriScoreTrend.reduce(
-                                                                (sum, t) =>
-                                                                    sum +
-                                                                    t.score,
-                                                                0,
-                                                            ) /
-                                                            data.nutriScoreTrend
-                                                                .length;
-                                                        const letter =
-                                                            avgScore >= 80
-                                                                ? "A"
-                                                                : avgScore >= 60
-                                                                  ? "B"
-                                                                  : avgScore >=
-                                                                      40
-                                                                    ? "C"
-                                                                    : avgScore >=
-                                                                        20
-                                                                      ? "D"
-                                                                      : "E";
-                                                        const letterColor =
-                                                            avgScore >= 80
+                                                    </p>
+                                                    <div className="flex gap-1">
+                                                        {[...Array(6)].map(
+                                                            (_, i) => {
+                                                                const filledBars =
+                                                                    Math.ceil(
+                                                                        (scan.nutrition_score /
+                                                                            100) *
+                                                                            6,
+                                                                    );
+                                                                return (
+                                                                    <div
+                                                                        key={i}
+                                                                        className={`h-1 rounded-full flex-1 ${
+                                                                            i <
+                                                                            filledBars
+                                                                                ? "bg-lime-400"
+                                                                                : "bg-gray-200"
+                                                                        }`}
+                                                                    />
+                                                                );
+                                                            },
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center shrink-0">
+                                                    <span
+                                                        className={`inline-flex items-center justify-center w-10 h-10 text-white text-sm font-bold rounded ${
+                                                            scan.nutrition_score >=
+                                                            80
                                                                 ? "bg-green-600"
-                                                                : avgScore >= 60
+                                                                : scan.nutrition_score >=
+                                                                    60
                                                                   ? "bg-green-500"
-                                                                  : avgScore >=
+                                                                  : scan.nutrition_score >=
                                                                       40
                                                                     ? "bg-yellow-500"
-                                                                    : avgScore >=
+                                                                    : scan.nutrition_score >=
                                                                         20
                                                                       ? "bg-orange-500"
-                                                                      : "bg-red-500";
-                                                        return (
-                                                            <div
-                                                                className={`w-6 h-6 rounded-full ${letterColor} flex items-center justify-center text-white text-xs font-bold`}>
-                                                                {letter}
-                                                            </div>
-                                                        );
-                                                    })()}
+                                                                      : "bg-red-500"
+                                                        }`}>
+                                                        {scan.nutrition_score >=
+                                                        80
+                                                            ? "A"
+                                                            : scan.nutrition_score >=
+                                                                60
+                                                              ? "B"
+                                                              : scan.nutrition_score >=
+                                                                  40
+                                                                ? "C"
+                                                                : scan.nutrition_score >=
+                                                                    20
+                                                                  ? "D"
+                                                                  : "E"}
+                                                    </span>
                                                 </div>
                                             </div>
+                                        );
+                                    })
+                                ) : (
+                                    <div className="text-center py-8 text-[#1a3129] opacity-60">
+                                        Belum ada scan hari ini
+                                    </div>
+                                )}
+                            </div>
 
-                                            {/* Dot Plot Chart */}
-                                            {nutriScoreChart}
+                            <button className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                                <Camera size={16} />
+                                Scan Produk Baru
+                            </button>
+                        </div>
 
-                                            {/* Legend */}
-                                            <div className="flex gap-3 mt-2 text-xs flex-wrap">
-                                                <div className="flex items-center gap-1.5">
-                                                    <div className="w-3 h-3 rounded-full bg-green-600"></div>
-                                                    <span className="text-[#1a3129] opacity-70">
-                                                        Sangat Baik (80+)
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-1.5">
-                                                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                                                    <span className="text-[#1a3129] opacity-70">
-                                                        Baik (60-79)
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-1.5">
-                                                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                                                    <span className="text-[#1a3129] opacity-70">
-                                                        Cukup (40-59)
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-1.5">
-                                                    <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                                                    <span className="text-[#1a3129] opacity-70">
-                                                        Kurang (20-39)
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-1.5">
-                                                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                                                    <span className="text-[#1a3129] opacity-70">
-                                                        Buruk (&lt;20)
-                                                    </span>
-                                                </div>
+                        {/* Right Column - Hidrasi, Energi & Mood, Aktivitas */}
+                        <div className="lg:col-span-1 space-y-6">
+                            {/* Nutri-Score 5-Day Trend */}
+                            {!loading &&
+                                data?.nutriScoreTrend &&
+                                data.nutriScoreTrend.length > 0 && (
+                                    <div className="p-6 md:p-8 bg-lime-50 rounded-[10px] outline-1 -outline-offset-1 outline-lime-100 flex flex-col gap-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                                                <h3 className="font-semibold text-[#1a3129]">
+                                                    Nutri-Score 5 Hari
+                                                </h3>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-xs text-[#1a3129] opacity-70">
+                                                    Rata-rata:{" "}
+                                                    {Math.round(
+                                                        data.nutriScoreTrend.reduce(
+                                                            (sum, t) =>
+                                                                sum + t.score,
+                                                            0,
+                                                        ) /
+                                                            data.nutriScoreTrend
+                                                                .length,
+                                                    )}
+                                                </span>
+                                                {(() => {
+                                                    const avgScore =
+                                                        data.nutriScoreTrend.reduce(
+                                                            (sum, t) =>
+                                                                sum + t.score,
+                                                            0,
+                                                        ) /
+                                                        data.nutriScoreTrend
+                                                            .length;
+                                                    const letter =
+                                                        avgScore >= 80
+                                                            ? "A"
+                                                            : avgScore >= 60
+                                                              ? "B"
+                                                              : avgScore >= 40
+                                                                ? "C"
+                                                                : avgScore >= 20
+                                                                  ? "D"
+                                                                  : "E";
+                                                    const letterColor =
+                                                        avgScore >= 80
+                                                            ? "bg-green-600"
+                                                            : avgScore >= 60
+                                                              ? "bg-green-500"
+                                                              : avgScore >= 40
+                                                                ? "bg-yellow-500"
+                                                                : avgScore >= 20
+                                                                  ? "bg-orange-500"
+                                                                  : "bg-red-500";
+                                                    return (
+                                                        <div
+                                                            className={`w-6 h-6 rounded-full ${letterColor} flex items-center justify-center text-white text-xs font-bold`}>
+                                                            {letter}
+                                                        </div>
+                                                    );
+                                                })()}
                                             </div>
                                         </div>
-                                    )}
-                            </div>
+
+                                        {/* Dot Plot Chart */}
+                                        {nutriScoreChart}
+
+                                        {/* Legend */}
+                                        <div className="flex gap-3 mt-2 text-xs flex-wrap">
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-3 h-3 rounded-full bg-green-600"></div>
+                                                <span className="text-[#1a3129] opacity-70">
+                                                    Sangat Baik (80+)
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                                                <span className="text-[#1a3129] opacity-70">
+                                                    Baik (60-79)
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                                <span className="text-[#1a3129] opacity-70">
+                                                    Cukup (40-59)
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                                                <span className="text-[#1a3129] opacity-70">
+                                                    Kurang (20-39)
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                                                <span className="text-[#1a3129] opacity-70">
+                                                    Buruk (&lt;20)
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                         </div>
                     </div>
-
-                    <MedForm
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
-                        onSaved={() => {
-                            fetchDashboardData();
-                        }}
-                    />
                 </div>
+
+                <MedForm
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSaved={() => {
+                        fetchDashboardData();
+                    }}
+                />
+            </div>
 
             {/* Product Detail Modal */}
             {selectedProduct && (

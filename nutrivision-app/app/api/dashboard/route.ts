@@ -22,6 +22,7 @@ interface ScanItem {
     product_id: number;
     product_name: string;
     product_brand: string | null;
+    image_path: string | null;
     nutrition_score: number;
     scanned_at: string;
 }
@@ -303,6 +304,7 @@ export async function GET(request: NextRequest) {
             `SELECT 
                 s.id,
                 s.product_id,
+                s.image_path,
                 p.name as product_name,
                 p.brand as product_brand,
                 s.nutrition_score,
