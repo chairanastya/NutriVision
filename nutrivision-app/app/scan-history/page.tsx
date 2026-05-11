@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Camera } from "lucide-react";
+import Image from "next/image";
 import Footer from "@/components/Footer";
 
 interface Scan {
@@ -10,6 +11,7 @@ interface Scan {
     product_id: number;
     product_name: string;
     product_brand: string | null;
+    image_path: string | null;
     nutrition_score: number;
     scanned_at: string;
 }
@@ -34,7 +36,8 @@ export default function ScanHistory() {
     const [scans, setScans] = useState<Scan[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [selectedProduct, setSelectedProduct] = useState<ProductDetail | null>(null);
+    const [selectedProduct, setSelectedProduct] =
+        useState<ProductDetail | null>(null);
     const [modalLoading, setModalLoading] = useState(false);
     const [modalError, setModalError] = useState<string | null>(null);
 
@@ -87,14 +90,14 @@ export default function ScanHistory() {
             setModalError(null);
 
             const response = await fetch(
-                `/api/product-detail?productId=${scan.product_id}&scanId=${scan.id}`
+                `/api/product-detail?productId=${scan.product_id}&scanId=${scan.id}`,
             );
 
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(
                     errorData.error ||
-                        `Failed to fetch product details (${response.status})`
+                        `Failed to fetch product details (${response.status})`,
                 );
             }
 
@@ -193,7 +196,19 @@ export default function ScanHistory() {
                                         className="p-6 bg-white rounded-[10px] border border-lime-200 shadow-sm hover:shadow-md hover:border-lime-300 transition-all cursor-pointer flex flex-col gap-4">
                                         <div
                                             className={`w-20 h-20 bg-linear-to-br ${gradients} rounded-lg flex items-center justify-center text-4xl`}>
-                                            {emoji}
+                                            {scan.image_path ? (
+                                                <div className="relative w-full h-full overflow-hidden rounded-lg">
+                                                    <Image
+                                                        src={scan.image_path}
+                                                        alt={scan.product_name}
+                                                        fill
+                                                        sizes="80px"
+                                                        className="object-cover"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                emoji
+                                            )}
                                         </div>
 
                                         <div className="flex-1 min-w-0">
@@ -207,7 +222,7 @@ export default function ScanHistory() {
                                             )}
                                             <p className="text-xs text-[#1a3129] opacity-50 mt-2">
                                                 {new Date(
-                                                    scan.scanned_at
+                                                    scan.scanned_at,
                                                 ).toLocaleDateString("id-ID", {
                                                     weekday: "short",
                                                     year: "numeric",
@@ -240,7 +255,7 @@ export default function ScanHistory() {
                                                 Score:{" "}
                                                 <span className="font-bold">
                                                     {Math.round(
-                                                        scan.nutrition_score
+                                                        scan.nutrition_score,
                                                     )}
                                                     /100
                                                 </span>
@@ -252,7 +267,10 @@ export default function ScanHistory() {
                         </div>
                     ) : (
                         <div className="text-center py-12">
-                            <Camera size={48} className="mx-auto text-gray-300 mb-4" />
+                            <Camera
+                                size={48}
+                                className="mx-auto text-gray-300 mb-4"
+                            />
                             <p className="text-[#1a3129] opacity-60 text-lg">
                                 Belum ada riwayat scan
                             </p>
@@ -281,7 +299,7 @@ export default function ScanHistory() {
                                 <p className="text-xs text-white opacity-80 mt-1">
                                     Scan:{" "}
                                     {new Date(
-                                        selectedProduct.scanned_at
+                                        selectedProduct.scanned_at,
                                     ).toLocaleDateString("id-ID")}
                                 </p>
                             </div>
@@ -324,7 +342,7 @@ export default function ScanHistory() {
                                                 <div className="flex flex-col items-end gap-1">
                                                     <span className="text-2xl font-bold text-[#1a3129]">
                                                         {Math.round(
-                                                            selectedProduct.nutrition_score
+                                                            selectedProduct.nutrition_score,
                                                         )}
                                                     </span>
                                                     <span className="text-xs text-[#1a3129] opacity-70">
@@ -380,13 +398,14 @@ export default function ScanHistory() {
                                                                     selectedProduct.nutrition_score >=
                                                                     (i + 1) * 20
                                                                         ? i < 2
-                                                                          ? "bg-green-500"
-                                                                          : i === 2
-                                                                            ? "bg-yellow-500"
-                                                                            : "bg-orange-500"
+                                                                            ? "bg-green-500"
+                                                                            : i ===
+                                                                                2
+                                                                              ? "bg-yellow-500"
+                                                                              : "bg-orange-500"
                                                                         : "bg-gray-200"
                                                                 }`}></div>
-                                                        )
+                                                        ),
                                                     )}
                                                 </div>
                                             </div>
@@ -422,12 +441,16 @@ export default function ScanHistory() {
                                                                     }
                                                                 </span>
                                                                 <span className="text-sm text-[#1a3129] opacity-70">
-                                                                    {nutrient.amount}
-                                                                    {nutrient.unit}
+                                                                    {
+                                                                        nutrient.amount
+                                                                    }
+                                                                    {
+                                                                        nutrient.unit
+                                                                    }
                                                                 </span>
                                                             </div>
                                                         </div>
-                                                    )
+                                                    ),
                                                 )
                                             ) : (
                                                 <p className="text-sm text-[#1a3129] opacity-60 text-center py-4">

@@ -1,7 +1,10 @@
 import { getScanPrompt } from "@/lib/prompts";
 import { NextRequest, NextResponse } from "next/server";
-import { queryDatabase } from "@/lib/db";
+import pool, { queryDatabase } from "@/lib/db";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { mkdir, unlink, writeFile } from "fs/promises";
+import path from "path";
+import { randomBytes, randomUUID } from "crypto";
 
 export const runtime = "nodejs";
 
@@ -45,6 +48,214 @@ type ProfileRow = {
     daily_sodium_limit: number | null;
     daily_calories_target: number | null;
 };
+
+type GeminiNutrientItem = {
+    name?: unknown;
+    amount?: unknown;
+    unit?: unknown;
+};
+
+type GeminiScanResult = {
+    type?: unknown;
+    product_name?: unknown;
+    nutrients?: unknown;
+    nutrition_grade?: unknown;
+    health_analysis?: unknown;
+    confidence_level?: unknown;
+};
+
+function toTrimmedString(value: unknown): string | null {
+    if (typeof value !== "string") return null;
+    const s = value.trim();
+    return s ? s : null;
+}
+
+function toFiniteNumber(value: unknown): number | null {
+    const n = typeof value === "number" ? value : Number(value);
+    return Number.isFinite(n) ? n : null;
+}
+
+function gradeToScore(grade: string | null): number | null {
+    if (!grade) return null;
+    const g = grade.toUpperCase();
+    if (g === "A") return 85;
+    if (g === "B") return 70;
+    if (g === "C") return 55;
+    if (g === "D") return 40;
+    if (g === "E") return 20;
+    return null;
+}
+
+function normalizeNutrientName(name: string): string {
+    return name.trim().replace(/\s+/g, " ");
+}
+
+function normalizeUnit(unit: string): string {
+    return unit.trim().replace(/\s+/g, " ");
+}
+
+function pickImageExtension(params: {
+    mimeType: string | null;
+    fileName: string | null;
+}): "jpg" | "jpeg" | "png" | "webp" {
+    const name = (params.fileName ?? "").trim();
+    const mime = (params.mimeType ?? "").trim().toLowerCase();
+
+    const allowed = new Set(["jpg", "jpeg", "png", "webp"]);
+
+    const fromName = (() => {
+        const base = name.split("/").pop() ?? name;
+        const parts = base.split(".");
+        if (parts.length < 2) return null;
+        const ext = parts[parts.length - 1].toLowerCase();
+        return allowed.has(ext)
+            ? (ext as "jpg" | "jpeg" | "png" | "webp")
+            : null;
+    })();
+    if (fromName) return fromName;
+
+    if (mime === "image/png") return "png";
+    if (mime === "image/webp") return "webp";
+    if (mime === "image/jpeg") return "jpg";
+    if (mime === "image/jpg") return "jpg";
+
+    return "jpg";
+}
+
+function newId(): string {
+    try {
+        return randomUUID();
+    } catch {
+        return randomBytes(16).toString("hex");
+    }
+}
+
+async function saveScanImage(params: {
+    buffer: Buffer;
+    mimeType: string | null;
+    fileName: string | null;
+}): Promise<{ publicPath: string; absolutePath: string }> {
+    const ext = pickImageExtension({
+        mimeType: params.mimeType,
+        fileName: params.fileName,
+    });
+
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "scans");
+    await mkdir(uploadDir, { recursive: true });
+
+    const fileId = newId();
+    const fileName = `scan_${fileId}.${ext}`;
+    const absolutePath = path.join(uploadDir, fileName);
+    const publicPath = `/uploads/scans/${fileName}`;
+
+    await writeFile(absolutePath, params.buffer);
+    return { publicPath, absolutePath };
+}
+
+async function persistScanToDatabase(params: {
+    userId: number | null;
+    imagePath: string | null;
+    cleanedGeminiJson: string;
+    parsedResult: unknown;
+}): Promise<{ scanId: number; productId: number }> {
+    const root = params.parsedResult as GeminiScanResult;
+    const productName = toTrimmedString(root.product_name) ?? "Unknown product";
+
+    const nutritionGrade = toTrimmedString(root.nutrition_grade);
+    const nutritionScore = gradeToScore(nutritionGrade);
+    const category = toTrimmedString(root.type);
+
+    const nutrientsRaw = root.nutrients;
+    const nutrientItems: GeminiNutrientItem[] = Array.isArray(nutrientsRaw)
+        ? (nutrientsRaw as GeminiNutrientItem[])
+        : [];
+
+    const client = await pool.connect();
+    try {
+        await client.query("BEGIN");
+
+        // Create a new product record for each scan to avoid mutating nutrients for past scans.
+        const productInsert = await client.query(
+            `INSERT INTO products (name, brand, serving_size, serving_unit)
+             VALUES ($1, $2, $3, $4)
+             RETURNING id`,
+            [productName.slice(0, 255), null, null, null],
+        );
+
+        const productId = Number(productInsert.rows[0]?.id);
+        if (!Number.isInteger(productId) || productId <= 0) {
+            throw new Error("Failed to create product");
+        }
+
+        // Upsert nutrients (by name) and insert amounts for this product.
+        for (const item of nutrientItems) {
+            const name = toTrimmedString(item?.name);
+            const unit = toTrimmedString(item?.unit);
+            const amount = toFiniteNumber(item?.amount);
+
+            if (!name || !unit || amount === null) continue;
+            const normalizedName = normalizeNutrientName(name);
+            const normalizedUnit = normalizeUnit(unit);
+
+            const existing = await client.query(
+                `SELECT id, unit FROM nutrients WHERE lower(name) = lower($1) LIMIT 1`,
+                [normalizedName],
+            );
+
+            let nutrientId: number;
+            if (existing.rows.length > 0) {
+                nutrientId = Number(existing.rows[0].id);
+            } else {
+                const inserted = await client.query(
+                    `INSERT INTO nutrients (name, unit)
+                     VALUES ($1, $2)
+                     RETURNING id`,
+                    [normalizedName, normalizedUnit],
+                );
+                nutrientId = Number(inserted.rows[0]?.id);
+            }
+
+            if (!Number.isInteger(nutrientId) || nutrientId <= 0) continue;
+
+            await client.query(
+                `INSERT INTO product_nutrients (product_id, nutrient_id, amount)
+                 VALUES ($1, $2, $3)`,
+                [productId, nutrientId, amount],
+            );
+        }
+
+        const scanInsert = await client.query(
+            `INSERT INTO scans (user_id, product_id, image_path, ocr_raw_text, nutrition_score, category)
+             VALUES ($1, $2, $3, $4, $5, $6)
+             RETURNING id`,
+            [
+                params.userId,
+                productId,
+                params.imagePath,
+                params.cleanedGeminiJson,
+                nutritionScore,
+                category,
+            ],
+        );
+
+        const scanId = Number(scanInsert.rows[0]?.id);
+        if (!Number.isInteger(scanId) || scanId <= 0) {
+            throw new Error("Failed to create scan");
+        }
+
+        await client.query("COMMIT");
+        return { scanId, productId };
+    } catch (e) {
+        try {
+            await client.query("ROLLBACK");
+        } catch {
+            // ignore rollback errors
+        }
+        throw e;
+    } finally {
+        client.release();
+    }
+}
 
 export async function POST(req: NextRequest) {
     try {
@@ -101,7 +312,8 @@ export async function POST(req: NextRequest) {
 
         // 2. Persiapkan Image Base64
         const bytes = await file.arrayBuffer();
-        const base64 = Buffer.from(bytes).toString("base64");
+        const imageBuffer = Buffer.from(bytes);
+        const base64 = imageBuffer.toString("base64");
 
         // 3. Panggil Gemini API
         const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
@@ -189,12 +401,41 @@ export async function POST(req: NextRequest) {
             throw new Error("Gemini returned invalid JSON");
         }
 
+        // 3b. Persist scan result into database (best-effort)
+        let saved: { scanId: number; productId: number } | null = null;
+        let saveError: string | null = null;
+        let savedImage: { publicPath: string; absolutePath: string } | null =
+            null;
+        try {
+            savedImage = await saveScanImage({
+                buffer: imageBuffer,
+                mimeType: file.type || null,
+                fileName: file.name || null,
+            });
+            saved = await persistScanToDatabase({
+                userId: sessionUser ? Number(sessionUser.id) : null,
+                imagePath: savedImage.publicPath,
+                cleanedGeminiJson: cleaned,
+                parsedResult,
+            });
+        } catch (e: unknown) {
+            console.error("Failed to save scan to database:", e);
+            saveError = e instanceof Error ? e.message : "Unknown DB error";
+            // Best-effort cleanup: if image was written but DB failed, attempt to remove it.
+            if (savedImage) {
+                await unlink(savedImage.absolutePath).catch(() => undefined);
+            }
+        }
+
         // 4. Return Response Berdasarkan Status Login
         if (sessionUser && profileData) {
             // User Login: Berikan hasil scan + data medis personal
             return NextResponse.json({
                 isLoggedIn: true,
                 result: parsedResult,
+                db: saved
+                    ? { saved: true, ...saved }
+                    : { saved: false, error: saveError },
                 medical_summary: {
                     conditions: profileData.conditions,
                     daily_limits: {
@@ -209,6 +450,9 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({
                 isLoggedIn: Boolean(sessionUser),
                 result: parsedResult,
+                db: saved
+                    ? { saved: true, ...saved }
+                    : { saved: false, error: saveError },
             });
         }
     } catch (error: unknown) {
