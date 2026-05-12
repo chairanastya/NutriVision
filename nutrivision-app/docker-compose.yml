@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
     container_name: nutrivision-app
     ports:
-      - "3001:3000"
+      - "3000:3000"
     environment:
       # Database Connection (Neon)
       DATABASE_URL: ${DATABASE_URL}
