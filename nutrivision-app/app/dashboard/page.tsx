@@ -452,29 +452,29 @@ export default function Dashboard() {
                     )}
 
                     {/* Header Welcome Section */}
-                    <div className="p-6 md:p-8 bg-linear-to-r from-[#2d6a3e] to-[#3d7d4a] rounded-[10px] mb-8">
-                        <div className="flex items-center justify-between gap-6">
+                    <div className="p-8 md:p-10 bg-gradient-to-r from-[#2d6a3e] to-[#3d7d4a] rounded-2xl mb-10 shadow-lg border border-[#4a8a5a]/30">
+                        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
                             {/* Column 1: Greeting */}
-                            <div className="text-white">
-                                <p className="text-xs opacity-80 mb-1">
+                            <div className="text-white flex-1">
+                                <p className="text-sm opacity-75 mb-2 font-medium tracking-wide">
                                     Selamat datang kembali!
                                 </p>
-                                <h1 className="text-2xl md:text-3xl font-bold">
+                                <h1 className="text-3xl md:text-4xl font-bold mb-2">
                                     Halo,{" "}
                                     {loading
                                         ? "User"
                                         : data?.user?.name || "User"}
                                     ! 👋
                                 </h1>
-                                <p className="text-xs opacity-80 mt-1">
+                                <p className="text-sm opacity-75">
                                     Pantau gizi & asupan kalorimu hari ini
                                 </p>
                             </div>
 
                             {/* Column 2: Stats */}
-                            <div className="flex gap-4 text-white shrink-0">
+                            <div className="flex gap-8 text-white">
                                 <div className="text-center">
-                                    <div className="text-2xl md:text-3xl font-bold">
+                                    <div className="text-3xl md:text-4xl font-bold mb-1">
                                         {loading
                                             ? "-"
                                             : Math.round(
@@ -482,148 +482,147 @@ export default function Dashboard() {
                                                       ?.total_calories || 0,
                                               )}
                                     </div>
-                                    <div className="text-xs opacity-80">
+                                    <div className="text-xs opacity-75 font-medium">
                                         kkal/kcal
                                     </div>
                                 </div>
+                                <div className="w-px bg-white/20"></div>
                                 <div className="text-center">
-                                    <div className="text-2xl md:text-3xl font-bold">
+                                    <div className="text-3xl md:text-4xl font-bold mb-1">
                                         {loading
                                             ? "-"
                                             : data?.dailyStats?.item_count || 0}
                                     </div>
-                                    <div className="text-xs opacity-80">
-                                        item makanan
+                                    <div className="text-xs opacity-75 font-medium">
+                                        item
                                     </div>
                                 </div>
                             </div>
 
                             {/* Column 3: Nutri-Score */}
-                            <div className="flex flex-col items-end gap-3 shrink-0">
-                                <div className="flex flex-col items-end gap-1">
-                                    <span className="text-xs font-semibold text-white opacity-90">
-                                        NUTRI-SCORE RATA-RATA
-                                    </span>
-                                    <div className="flex items-center gap-3">
-                                        {loading ? (
-                                            <div className="text-white text-sm">
-                                                -
+                            <div className="flex flex-col items-start lg:items-end gap-2">
+                                <span className="text-xs font-semibold text-white opacity-75 uppercase tracking-wider">
+                                    Nutri-Score
+                                </span>
+                                <div className="flex items-center gap-3">
+                                    {loading ? (
+                                        <div className="text-white text-sm">
+                                            -
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="flex flex-col items-end gap-1">
+                                                <span className="text-sm text-white font-semibold">
+                                                    {Math.round(
+                                                        (data?.scans?.reduce(
+                                                            (sum, scan) =>
+                                                                sum +
+                                                                scan.nutrition_score,
+                                                            0,
+                                                        ) || 0) /
+                                                            (data?.scans
+                                                                ?.length ||
+                                                                1),
+                                                    )}
+                                                </span>
+                                                <span className="text-xs text-white opacity-80">
+                                                    poin
+                                                </span>
                                             </div>
-                                        ) : (
-                                            <>
-                                                <div className="flex flex-col items-end gap-1">
-                                                    <span className="text-sm text-white font-semibold">
-                                                        {Math.round(
-                                                            (data?.scans?.reduce(
-                                                                (sum, scan) =>
-                                                                    sum +
-                                                                    scan.nutrition_score,
-                                                                0,
-                                                            ) || 0) /
-                                                                (data?.scans
-                                                                    ?.length ||
-                                                                    1),
-                                                        )}
-                                                    </span>
-                                                    <span className="text-xs text-white opacity-80">
-                                                        poin
-                                                    </span>
-                                                </div>
-                                                <div
-                                                    className={`w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold shrink-0 ${(() => {
-                                                        const avgScore =
-                                                            (data?.scans?.reduce(
-                                                                (sum, scan) =>
-                                                                    sum +
-                                                                    scan.nutrition_score,
-                                                                0,
-                                                            ) || 0) /
-                                                            (data?.scans
-                                                                ?.length || 1);
-                                                        if (avgScore >= 80)
-                                                            return "bg-green-600";
-                                                        if (avgScore >= 60)
-                                                            return "bg-green-500";
-                                                        if (avgScore >= 40)
-                                                            return "bg-yellow-500";
-                                                        if (avgScore >= 20)
-                                                            return "bg-orange-500";
-                                                        return "bg-red-500";
-                                                    })()}`}>
-                                                    {(() => {
-                                                        const avgScore =
-                                                            (data?.scans?.reduce(
-                                                                (sum, scan) =>
-                                                                    sum +
-                                                                    scan.nutrition_score,
-                                                                0,
-                                                            ) || 0) /
-                                                            (data?.scans
-                                                                ?.length || 1);
-                                                        if (avgScore >= 80)
-                                                            return "A";
-                                                        if (avgScore >= 60)
-                                                            return "B";
-                                                        if (avgScore >= 40)
-                                                            return "C";
-                                                        if (avgScore >= 20)
-                                                            return "D";
-                                                        return "E";
-                                                    })()}
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
+                                            <div
+                                                className={`w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold shrink-0 ${(() => {
+                                                    const avgScore =
+                                                        (data?.scans?.reduce(
+                                                            (sum, scan) =>
+                                                                sum +
+                                                                scan.nutrition_score,
+                                                            0,
+                                                        ) || 0) /
+                                                        (data?.scans
+                                                            ?.length || 1);
+                                                    if (avgScore >= 80)
+                                                        return "bg-green-600";
+                                                    if (avgScore >= 60)
+                                                        return "bg-green-500";
+                                                    if (avgScore >= 40)
+                                                        return "bg-yellow-500";
+                                                    if (avgScore >= 20)
+                                                        return "bg-orange-500";
+                                                    return "bg-red-500";
+                                                })()}`}>
+                                                {(() => {
+                                                    const avgScore =
+                                                        (data?.scans?.reduce(
+                                                            (sum, scan) =>
+                                                                sum +
+                                                                scan.nutrition_score,
+                                                            0,
+                                                        ) || 0) /
+                                                        (data?.scans
+                                                            ?.length || 1);
+                                                    if (avgScore >= 80)
+                                                        return "A";
+                                                    if (avgScore >= 60)
+                                                        return "B";
+                                                    if (avgScore >= 40)
+                                                        return "C";
+                                                    if (avgScore >= 20)
+                                                        return "D";
+                                                    return "E";
+                                                })()}
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* --- Status Kesehatan Section --- */}
-                    <div className="p-6 md:p-8 bg-lime-50 rounded-[10px] outline-1 -outline-offset-1 outline-lime-100 flex flex-col gap-4 mb-8">
+                    <div className="p-8 md:p-10 bg-lime-50 rounded-2xl outline-1 -outline-offset-1 outline-lime-200 flex flex-col gap-6 mb-10 shadow-md border border-lime-200/50 hover:shadow-lg transition-shadow">
                         {/* Section Header dengan Tombol Edit */}
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-6 bg-[#2d6a3e] rounded-full"></span>
-                                <h2 className="text-xl font-bold text-[#1a3129]">
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-1 h-8 bg-gradient-to-b from-[#2d6a3e] to-[#3d7d4a] rounded-full"></div>
+                                <h2 className="text-2xl font-bold text-[#1a3129]">
                                     Status Kesehatan
                                 </h2>
                             </div>
                             <button
-                                className="flex items-center gap-2 px-4 py-2 bg-white border border-lime-200 text-[#2d6a3e] rounded-lg text-sm font-semibold hover:bg-lime-50 transition-all shadow-xs"
+                                className="flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-[#cbea7b] text-[#2d6a3e] rounded-lg text-sm font-semibold hover:bg-lime-50 transition-all shadow-sm hover:shadow-md active:scale-95"
                                 onClick={() => setIsModalOpen(true)}>
                                 <span>✏️</span>
-                                Lengkapi / Edit Data
+                                Edit
                             </button>
                         </div>
 
                         {/* Grid 3 Kartu (Profil Fisik, Riwayat Medis, Target) */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {/* Card 1: Profil Fisik */}
-                            <div className="p-5 bg-white rounded-[10px] border border-lime-200 shadow-sm flex flex-col gap-3">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-xl">📊</span>
-                                    <h3 className="font-bold text-[#1a3129] text-sm uppercase tracking-wide">
+                            <div className="p-6 bg-white rounded-xl border-2 border-lime-200/60 shadow-md hover:shadow-lg hover:border-lime-300 transition-all flex flex-col gap-4">
+                                <div className="flex items-center gap-3 mb-1">
+                                    <span className="text-2xl">📊</span>
+                                    <h3 className="font-bold text-[#1a3129] text-sm uppercase tracking-wider">
                                         Profil Fisik
                                     </h3>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <p className="text-[10px] text-gray-400 uppercase font-bold">
+                                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide">
                                             Berat / Tinggi
                                         </p>
-                                        <p className="text-sm font-semibold text-[#1a3129]">
+                                        <p className="text-sm font-semibold text-[#1a3129] mt-1">
                                             {loading
                                                 ? "-"
                                                 : `${weightKg ?? "-"} kg / ${heightCm ?? "-"} cm`}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-[10px] text-gray-400 uppercase font-bold">
+                                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide">
                                             Status BMI
                                         </p>
                                         <p
-                                            className={`text-sm font-semibold ${bmiInfo?.className || "text-[#1a3129]"}`}>
+                                            className={`text-sm font-semibold mt-1 ${bmiInfo?.className || "text-[#1a3129]"}`}>
                                             {loading
                                                 ? "-"
                                                 : bmiInfo
@@ -632,10 +631,10 @@ export default function Dashboard() {
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-[10px] text-gray-400 uppercase font-bold">
+                                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide">
                                             Umur
                                         </p>
-                                        <p className="text-sm font-semibold text-[#1a3129]">
+                                        <p className="text-sm font-semibold text-[#1a3129] mt-1">
                                             {loading
                                                 ? "-"
                                                 : ageYears !== null
@@ -644,10 +643,10 @@ export default function Dashboard() {
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-[10px] text-gray-400 uppercase font-bold">
+                                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wide">
                                             Aktivitas
                                         </p>
-                                        <p className="text-sm font-semibold text-[#1a3129]">
+                                        <p className="text-sm font-semibold text-[#1a3129] mt-1">
                                             {loading ? "-" : activityLabel}
                                         </p>
                                     </div>
@@ -655,10 +654,10 @@ export default function Dashboard() {
                             </div>
 
                             {/* Card 2: Riwayat Medis */}
-                            <div className="p-5 bg-white rounded-[10px] border border-lime-200 shadow-sm flex flex-col gap-3">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-xl">🏥</span>
-                                    <h3 className="font-bold text-[#1a3129] text-sm uppercase tracking-wide">
+                            <div className="p-6 bg-white rounded-xl border-2 border-lime-200/60 shadow-md hover:shadow-lg hover:border-lime-300 transition-all flex flex-col gap-4">
+                                <div className="flex items-center gap-3 mb-1">
+                                    <span className="text-2xl">🏥</span>
+                                    <h3 className="font-bold text-[#1a3129] text-sm uppercase tracking-wider">
                                         Riwayat Medis
                                     </h3>
                                 </div>
@@ -673,8 +672,8 @@ export default function Dashboard() {
                                                 key={c.id}
                                                 className={
                                                     idx % 2 === 0
-                                                        ? "px-3 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-full border border-red-100"
-                                                        : "px-3 py-1 bg-orange-50 text-orange-600 text-xs font-bold rounded-full border border-orange-100"
+                                                        ? "px-3 py-1.5 bg-red-50 text-red-600 text-xs font-bold rounded-full border border-red-200"
+                                                        : "px-3 py-1.5 bg-orange-50 text-orange-600 text-xs font-bold rounded-full border border-orange-200"
                                                 }>
                                                 {c.name}
                                             </span>
@@ -688,7 +687,7 @@ export default function Dashboard() {
                             </div>
 
                             {/* Card 3: Target Personalisasi */}
-                            <div className="p-5 bg-white rounded-[10px] border border-lime-200 shadow-sm flex flex-col gap-3">
+                            <div className="p-6 bg-white rounded-xl border-2 border-lime-200/60 shadow-md hover:shadow-lg hover:border-lime-300 transition-all flex flex-col gap-4">
                                 <div className="flex items-center gap-2 mb-1">
                                     <span className="text-xl">🎯</span>
                                     <h3 className="font-bold text-[#1a3129] text-sm uppercase tracking-wide">
@@ -798,13 +797,13 @@ export default function Dashboard() {
                                                                 {t.recommendedLimit !==
                                                                     null &&
                                                                 profileLimit !==
-                                                                    null ? (
+                                                                    null && (
                                                                     <span className="ml-2 text-[10px] font-semibold text-gray-400">
                                                                         (Rekom.{" "}
                                                                         {`${t.recommendedLimit}${t.unit ?? unit}`}
                                                                         )
                                                                     </span>
-                                                                ) : null}
+                                                                )}
                                                             </span>
                                                         </div>
                                                         {isSugar ? (
@@ -860,17 +859,17 @@ export default function Dashboard() {
                     </div>
 
                     {/* Main Content Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[4fr_5fr_3fr] gap-4 md:gap-6 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[4fr_5fr_3fr] gap-6 md:gap-8 mb-8">
                             {/* Left Column - Calorie Daily */}
-                            <div className="p-6 md:p-8 bg-lime-50 rounded-[10px] outline-1 -outline-offset-1 outline-lime-100 flex flex-col gap-4">
+                            <div className="p-8 md:p-10 bg-lime-50 rounded-2xl outline-1 -outline-offset-1 outline-lime-200 flex flex-col gap-6 shadow-md hover:shadow-lg border border-lime-200/50 transition-shadow">
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-3">
                                         <span className="w-2 h-2 bg-green-600 rounded-full"></span>
-                                        <h3 className="font-semibold text-[#1a3129]">
+                                        <h3 className="font-bold text-[#1a3129] text-lg">
                                             Kalori Harian
                                         </h3>
                                     </div>
-                                    <span className="text-xs text-gray-400">
+                                    <span className="text-xs text-gray-500 bg-white px-3 py-1 rounded-full">
                                         {loading
                                             ? "-"
                                             : Math.round(
@@ -881,7 +880,7 @@ export default function Dashboard() {
                                                           ?.total_calories ||
                                                           0),
                                               )}{" "}
-                                        kcal tersisa
+                                        tersisa
                                     </span>
                                 </div>
 
@@ -1052,22 +1051,19 @@ export default function Dashboard() {
                             </div>
 
                             {/* Middle Column - Riwayat Scan */}
-                            <div className="p-6 md:p-8 bg-lime-50 rounded-[10px] outline-1 -outline-offset-1 outline-lime-100 flex flex-col gap-4">
+                            <div className="p-8 md:p-10 bg-white rounded-2xl border-2 border-lime-200/60 shadow-md hover:shadow-lg transition-all md:col-span-2 lg:col-span-1 flex flex-col gap-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <h3 className="font-semibold text-[#1a3129]">
-                                            Riwayat Scan
-                                        </h3>
-                                        <p className="text-xs text-[#1a3129] opacity-60 mt-1">
-                                            Ringkasan analisis produk yang
-                                            pernah kamu scan
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <span className="w-2 h-2 bg-[#cbea7b] rounded-full"></span>
+                                            <h3 className="font-bold text-[#1a3129] text-lg">
+                                                Riwayat Scan
+                                            </h3>
+                                        </div>
+                                        <p className="text-xs text-gray-500 ml-5">
+                                            Ringkasan produk terbaru
                                         </p>
                                     </div>
-                                    <button 
-                                        onClick={() => router.push("/scan-history")}
-                                        className="px-3 py-1 bg-[#cbea7b] text-black rounded-lg text-xs font-semibold hover:bg-[#b8d96a] transition-colors whitespace-nowrap">
-                                        Lihat Semua
-                                    </button>
                                 </div>
 
                                 <div className="space-y-3">
@@ -1102,7 +1098,7 @@ export default function Dashboard() {
                                                     }
                                                     className="flex gap-3 p-3 bg-white rounded-lg border border-lime-100 hover:shadow-md hover:bg-lime-50 transition-all cursor-pointer">
                                                     <div
-                                                        className={`w-16 h-16 bg-linear-to-br ${gradients} rounded-lg flex items-center justify-center shrink-0 text-2xl`}>
+                                                        className={`w-16 h-16 bg-gradient-to-br ${gradients} rounded-lg flex items-center justify-center shrink-0 text-2xl`}>
                                                         {emoji}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
@@ -1198,11 +1194,11 @@ export default function Dashboard() {
                                 {!loading &&
                                     data?.nutriScoreTrend &&
                                     data.nutriScoreTrend.length > 0 && (
-                                        <div className="p-6 md:p-8 bg-lime-50 rounded-[10px] outline-1 -outline-offset-1 outline-lime-100 flex flex-col gap-4">
+                                        <div className="p-8 md:p-10 bg-lime-50 rounded-2xl outline-1 -outline-offset-1 outline-lime-200 shadow-md hover:shadow-lg border border-lime-200/50 transition-shadow flex flex-col gap-6">
                                             <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                                                    <h3 className="font-semibold text-[#1a3129]">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
+                                                    <h3 className="font-bold text-[#1a3129] text-lg">
                                                         Nutri-Score 5 Hari
                                                     </h3>
                                                 </div>
@@ -1307,43 +1303,47 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    <MedForm
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
-                        onSaved={() => {
-                            fetchDashboardData();
-                        }}
-                    />
+                <MedForm
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSaved={() => {
+                        fetchDashboardData();
+                    }}
+                />
                 </div>
+            </div>
 
-            {/* Product Detail Modal */}
-            {selectedProduct && (
-                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+        {selectedProduct && (
+            <div className="fixed inset-0 bg-black/30 backdrop-blur-md z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-white/50">
                         {/* Modal Header */}
-                        <div className="sticky top-0 z-20 bg-linear-to-r from-[#2d6a3e] to-[#3d7d4a] p-6 flex items-center justify-between shrink-0 shadow-md">
+                        <div className="sticky top-0 z-20 bg-gradient-to-r from-[#2d6a3e] to-[#3d7d4a] px-8 py-6 flex items-center justify-between shrink-0 shadow-lg">
                             <div>
                                 <h2 className="text-2xl font-bold text-white">
                                     {selectedProduct.name}
                                     {selectedProduct.brand &&
                                         ` (${selectedProduct.brand})`}
                                 </h2>
-                                <p className="text-xs text-white opacity-80 mt-1">
-                                    Scan:{" "}
+                                <p className="text-sm text-white/80 mt-1">
+                                    Scanned:{" "}
                                     {new Date(
                                         selectedProduct.scanned_at,
-                                    ).toLocaleDateString("id-ID")}
+                                    ).toLocaleDateString("id-ID", {
+                                        weekday: "short",
+                                        day: "numeric",
+                                        month: "short",
+                                    })}
                                 </p>
                             </div>
                             <button
                                 onClick={closeModal}
-                                className="text-white text-2xl font-bold hover:opacity-70">
+                                className="text-white text-3xl font-light hover:opacity-60 transition-opacity">
                                 ✕
                             </button>
                         </div>
 
                         {/* Modal Body */}
-                        <div className="p-6 space-y-6 overflow-y-auto flex-1">
+                        <div className="p-8 space-y-6 overflow-y-auto flex-1 bg-gray-50">
                             {modalLoading && (
                                 <div className="text-center py-8 text-[#1a3129] opacity-60">
                                     Loading product details...
@@ -1359,7 +1359,7 @@ export default function Dashboard() {
                             {!modalLoading && !modalError && (
                                 <>
                                     {/* Nutri-Score Section */}
-                                    <div className="bg-lime-50 rounded-lg p-6 border border-lime-100">
+                                    <div className="bg-white rounded-xl p-8 border-2 border-lime-200/60 shadow-md hover:shadow-lg transition-shadow">
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-xs text-[#1a3129] opacity-70 mb-1">
@@ -1552,9 +1552,9 @@ export default function Dashboard() {
                                     </div>
 
                                     {/* Nutrients Section */}
-                                    <div>
-                                        <h3 className="text-lg font-bold text-[#1a3129] mb-4">
-                                            Nutrient Information
+                                    <div className="bg-white rounded-xl p-8 border-2 border-lime-200/60 shadow-md hover:shadow-lg transition-shadow">
+                                        <h3 className="text-lg font-bold text-[#1a3129] mb-6">
+                                            📋 Informasi Nutrisi Lengkap
                                         </h3>
                                         <div className="space-y-3">
                                             {selectedProduct.nutrients &&
@@ -1564,29 +1564,27 @@ export default function Dashboard() {
                                                     (nutrient, idx) => (
                                                         <div
                                                             key={idx}
-                                                            className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-                                                            <div className="flex items-center justify-between">
-                                                                <span className="text-sm font-semibold text-[#1a3129]">
-                                                                    {
-                                                                        nutrient.nutrient_name
-                                                                    }
-                                                                </span>
-                                                                <span className="text-sm font-bold text-green-600">
-                                                                    {Math.round(
-                                                                        nutrient.amount *
-                                                                            10,
-                                                                    ) / 10}{" "}
-                                                                    {
-                                                                        nutrient.unit
-                                                                    }
-                                                                </span>
-                                                            </div>
+                                                            className="flex items-center justify-between p-4 bg-lime-50 rounded-lg border border-lime-200/60 hover:border-lime-300 hover:bg-lime-100/50 transition-all">
+                                                            <span className="text-sm font-semibold text-[#1a3129]">
+                                                                {
+                                                                    nutrient.nutrient_name
+                                                                }
+                                                            </span>
+                                                            <span className="text-sm font-bold text-[#2d6a3e] bg-white px-3 py-1 rounded-full">
+                                                                {Math.round(
+                                                                    nutrient.amount *
+                                                                        10,
+                                                                ) / 10}{" "}
+                                                                {
+                                                                    nutrient.unit
+                                                                }
+                                                            </span>
                                                         </div>
                                                     ),
                                                 )
                                             ) : (
-                                                <p className="text-sm text-[#1a3129] opacity-60 text-center py-4">
-                                                    No nutrient data available
+                                                <p className="text-sm text-[#1a3129] opacity-60 text-center py-8 bg-lime-50 rounded-lg">
+                                                    Data nutrisi tidak tersedia
                                                 </p>
                                             )}
                                         </div>
@@ -1598,7 +1596,7 @@ export default function Dashboard() {
                 </div>
             )}
 
-            <Footer />
+        <Footer />
         </div>
     );
 }
