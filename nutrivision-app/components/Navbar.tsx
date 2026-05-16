@@ -13,9 +13,13 @@ interface UserData {
 export default function Navbar() {
     const [activeSection, setActiveSection] = useState("beranda");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    
+    // Start with null - will hydrate from sessionStorage in useEffect
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [isHydrated, setIsHydrated] = useState(false);
+    
     const pathname = usePathname();
     const router = useRouter();
 
@@ -34,6 +38,9 @@ export default function Navbar() {
                 console.error("Logout failed with status:", response.status);
             }
 
+            // Clear session storage
+            sessionStorage.removeItem("nv_user");
+
             // Clear local state regardless of API response
             setIsLoggedIn(false);
             setUserData(null);
@@ -44,6 +51,10 @@ export default function Navbar() {
             router.push("/");
         } catch (error) {
             console.error("Logout error:", error);
+            
+            // Clear session storage on error too
+            sessionStorage.removeItem("nv_user");
+            
             // Still clear local state on error
             setIsLoggedIn(false);
             setUserData(null);
@@ -76,30 +87,57 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Hydrate from sessionStorage after mount
+    useEffect(() => {
+        const cachedUser = sessionStorage.getItem("nv_user");
+        if (cachedUser) {
+            const user = JSON.parse(cachedUser);
+            setUserData(user);
+            setIsLoggedIn(true);
+        } else {
+            setIsLoggedIn(false);
+        }
+        setIsHydrated(true);
+    }, []);
+
     useEffect(() => {
         const controller = new AbortController();
 
         (async () => {
             try {
+                // Verify with server
                 const res = await fetch("/api/auth/me", {
                     method: "GET",
                     credentials: "include",
                     signal: controller.signal,
                 });
+
                 if (!res.ok) {
+                    // Session invalid - clear everything
                     setIsLoggedIn(false);
+                    setUserData(null);
+                    sessionStorage.removeItem("nv_user");
                     return;
                 }
+
                 const data = (await res.json()) as {
                     isLoggedIn?: boolean;
                     user?: UserData;
                 };
-                setIsLoggedIn(Boolean(data?.isLoggedIn));
+
                 if (data?.user) {
+                    setIsLoggedIn(true);
                     setUserData(data.user);
+                    sessionStorage.setItem("nv_user", JSON.stringify(data.user));
+                } else {
+                    setIsLoggedIn(false);
+                    setUserData(null);
+                    sessionStorage.removeItem("nv_user");
                 }
-            } catch {
-                setIsLoggedIn(false);
+            } catch (error) {
+                // Network error - keep cache state, don't modify anything
+                // State is already initialized from cache in initial render
+                console.log("Auth verification error (keeping cache):", error);
             }
         })();
 
@@ -133,9 +171,9 @@ export default function Navbar() {
                 </div>
 
                 {/* Desktop Navigation Links */}
-                <div className="hidden md:flex items-center gap-7">
+                <div className="hidden md:flex items-center gap-7" suppressHydrationWarning>
                     {/* Menu Items - Show only for non-logged-in users or home page */}
-                    {!isLoggedIn && (
+                    {!isHydrated || !isLoggedIn ? (
                         <div className="flex items-center gap-5">
                             <a
                                 href="#beranda"
@@ -169,10 +207,10 @@ export default function Navbar() {
                                 Scan
                             </a>
                         </div>
-                    )}
+                    ) : null}
 
                     {/* Logged-in user menu */}
-                    {isLoggedIn && (
+                    {isHydrated && isLoggedIn ? (
                         <div className="flex items-center gap-5">
                             <a
                                 href="/dashboard"
@@ -193,20 +231,30 @@ export default function Navbar() {
                                 Scan
                             </a>
                         </div>
-                    )}
+                    ) : null}
 
                     {/* Log In Button or Profile */}
-                    {isLoggedIn === false &&
-                        pathname !== "/login" &&
-                        pathname !== "/signup" && (
-                            <button
-                                onClick={handleLoginClick}
-                                className="px-4 py-3 bg-lime-300 rounded-md hover:bg-lime-200 transition">
-                                <span className="text-md font-regular font-sans text-neutral-800">
-                                    Log In
-                                </span>
-                            </button>
-                        )}
+                    {!isHydrated ? (
+                        // During hydration, show Login button (safe default)
+                        <button
+                            onClick={handleLoginClick}
+                            className="px-4 py-3 bg-lime-300 rounded-md hover:bg-lime-200 transition">
+                            <span className="text-md font-regular font-sans text-neutral-800">
+                                Log In
+                            </span>
+                        </button>
+                    ) : isLoggedIn === false &&
+                      pathname !== "/login" &&
+                      pathname !== "/signup" ? (
+                        // After hydration, if not logged in
+                        <button
+                            onClick={handleLoginClick}
+                            className="px-4 py-3 bg-lime-300 rounded-md hover:bg-lime-200 transition">
+                            <span className="text-md font-regular font-sans text-neutral-800">
+                                Log In
+                            </span>
+                        </button>
+                    ) : null}
 
                     {/* User Profile Dropdown */}
                     {isLoggedIn && userData && (
@@ -270,9 +318,9 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="md:hidden bg-[#1a3129]/90 border-t border-lime-100/30 px-8 py-4">
+                <div className="md:hidden bg-[#1a3129]/90 border-t border-lime-100/30 px-8 py-4" suppressHydrationWarning>
                     <div className="flex flex-col gap-4">
-                        {!isLoggedIn && (
+                        {!isHydrated || !isLoggedIn ? (
                             <>
                                 <a
                                     href="#beranda"
@@ -297,7 +345,7 @@ export default function Navbar() {
                                     Tentang
                                 </a>
                             </>
-                        )}
+                        ) : null}
 
                         <a
                             href="/scan"
@@ -310,7 +358,7 @@ export default function Navbar() {
                             Scan
                         </a>
 
-                        {isLoggedIn && (
+                        {isHydrated && isLoggedIn ? (
                             <a
                                 href="/dashboard"
                                 onClick={() => setIsMenuOpen(false)}
@@ -321,11 +369,11 @@ export default function Navbar() {
                                 }`}>
                                 Dashboard
                             </a>
-                        )}
+                        ) : null}
 
-                        {isLoggedIn === false &&
+                        {!isHydrated || (isLoggedIn === false &&
                             pathname !== "/login" &&
-                            pathname !== "/signup" && (
+                            pathname !== "/signup") ? (
                                 <button
                                     onClick={handleLoginClick}
                                     className="mt-2 mx-auto px-4 py-3 bg-lime-300 rounded-md hover:bg-lime-200 transition">
@@ -333,7 +381,7 @@ export default function Navbar() {
                                         Log In
                                     </span>
                                 </button>
-                            )}
+                            ) : null}
 
                         {isLoggedIn && userData && (
                             <>
