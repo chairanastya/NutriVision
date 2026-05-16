@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Camera } from "lucide-react";
 import Image from "next/image";
 import Footer from "@/components/Footer";
+import ProductDetailModal from "@/components/ProductDetailModal";
 
 interface Scan {
     id: number;
@@ -149,24 +150,7 @@ export default function ScanHistory() {
                         </div>
                     ) : scans.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {scans.map((scan, idx) => {
-                                const emoji = [
-                                    "🥣",
-                                    "🍫",
-                                    "🥐",
-                                    "🍕",
-                                    "🥗",
-                                    "🍎",
-                                ][idx % 6];
-                                const gradients = [
-                                    "from-blue-100 to-blue-50",
-                                    "from-amber-100 to-amber-50",
-                                    "from-orange-100 to-orange-50",
-                                    "from-red-100 to-red-50",
-                                    "from-green-100 to-green-50",
-                                    "from-purple-100 to-purple-50",
-                                ][idx % 6];
-
+                            {scans.map((scan) => {
                                 const scoreColor =
                                     scan.nutrition_score >= 80
                                         ? "bg-green-600"
@@ -194,23 +178,6 @@ export default function ScanHistory() {
                                         key={scan.id}
                                         onClick={() => fetchProductDetail(scan)}
                                         className="p-6 bg-white rounded-[10px] border border-lime-200 shadow-sm hover:shadow-md hover:border-lime-300 transition-all cursor-pointer flex flex-col gap-4">
-                                        <div
-                                            className={`w-20 h-20 bg-linear-to-br ${gradients} rounded-lg flex items-center justify-center text-4xl`}>
-                                            {scan.image_path ? (
-                                                <div className="relative w-full h-full overflow-hidden rounded-lg">
-                                                    <Image
-                                                        src={scan.image_path}
-                                                        alt={scan.product_name}
-                                                        fill
-                                                        sizes="80px"
-                                                        className="object-cover"
-                                                    />
-                                                </div>
-                                            ) : (
-                                                emoji
-                                            )}
-                                        </div>
-
                                         <div className="flex-1 min-w-0">
                                             <h3 className="font-bold text-[#1a3129] text-lg truncate">
                                                 {scan.product_name}
@@ -285,186 +252,12 @@ export default function ScanHistory() {
             </div>
 
             {/* Product Detail Modal */}
-            {selectedProduct && (
-                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-                        {/* Modal Header */}
-                        <div className="sticky top-0 z-20 bg-linear-to-r from-[#2d6a3e] to-[#3d7d4a] p-6 flex items-center justify-between shrink-0 shadow-md">
-                            <div>
-                                <h2 className="text-2xl font-bold text-white">
-                                    {selectedProduct.name}
-                                    {selectedProduct.brand &&
-                                        ` (${selectedProduct.brand})`}
-                                </h2>
-                                <p className="text-xs text-white opacity-80 mt-1">
-                                    Scan:{" "}
-                                    {new Date(
-                                        selectedProduct.scanned_at,
-                                    ).toLocaleDateString("id-ID")}
-                                </p>
-                            </div>
-                            <button
-                                onClick={closeModal}
-                                className="text-white text-2xl font-bold hover:opacity-70">
-                                ✕
-                            </button>
-                        </div>
-
-                        {/* Modal Body */}
-                        <div className="p-6 space-y-6 overflow-y-auto flex-1">
-                            {modalLoading && (
-                                <div className="text-center py-8 text-[#1a3129] opacity-60">
-                                    Loading product details...
-                                </div>
-                            )}
-
-                            {modalError && (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                                    {modalError}
-                                </div>
-                            )}
-
-                            {!modalLoading && !modalError && (
-                                <>
-                                    {/* Nutri-Score Section */}
-                                    <div className="bg-lime-50 rounded-lg p-6 border border-lime-100">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <p className="text-xs text-[#1a3129] opacity-70 mb-1">
-                                                    Nutrient Score
-                                                </p>
-                                                <p className="text-sm text-[#1a3129] opacity-60">
-                                                    Skor kualitas nutrisi produk
-                                                    ini
-                                                </p>
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex flex-col items-end gap-1">
-                                                    <span className="text-2xl font-bold text-[#1a3129]">
-                                                        {Math.round(
-                                                            selectedProduct.nutrition_score,
-                                                        )}
-                                                    </span>
-                                                    <span className="text-xs text-[#1a3129] opacity-70">
-                                                        poin
-                                                    </span>
-                                                </div>
-                                                <div
-                                                    className={`w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold ${
-                                                        selectedProduct.nutrition_score >=
-                                                        80
-                                                            ? "bg-green-600"
-                                                            : selectedProduct.nutrition_score >=
-                                                                60
-                                                              ? "bg-green-500"
-                                                              : selectedProduct.nutrition_score >=
-                                                                  40
-                                                                ? "bg-yellow-500"
-                                                                : selectedProduct.nutrition_score >=
-                                                                    20
-                                                                  ? "bg-orange-500"
-                                                                  : "bg-red-500"
-                                                    }`}>
-                                                    {selectedProduct.nutrition_score >=
-                                                    80
-                                                        ? "A"
-                                                        : selectedProduct.nutrition_score >=
-                                                            60
-                                                          ? "B"
-                                                          : selectedProduct.nutrition_score >=
-                                                              40
-                                                            ? "C"
-                                                            : selectedProduct.nutrition_score >=
-                                                                20
-                                                              ? "D"
-                                                              : "E"}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Progress Visualization */}
-                                        <div className="mt-6 pt-4 border-t border-lime-200">
-                                            <div className="mb-3">
-                                                <p className="text-xs font-semibold text-[#1a3129] mb-2">
-                                                    📊 Kualitas Nutrisi (Skala
-                                                    0-100)
-                                                </p>
-                                                <div className="flex gap-1">
-                                                    {[0, 1, 2, 3, 4].map(
-                                                        (i) => (
-                                                            <div
-                                                                key={i}
-                                                                className={`flex-1 h-2 rounded-full ${
-                                                                    selectedProduct.nutrition_score >=
-                                                                    (i + 1) * 20
-                                                                        ? i < 2
-                                                                            ? "bg-green-500"
-                                                                            : i ===
-                                                                                2
-                                                                              ? "bg-yellow-500"
-                                                                              : "bg-orange-500"
-                                                                        : "bg-gray-200"
-                                                                }`}></div>
-                                                        ),
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center justify-between text-xs">
-                                                <span className="text-[#1a3129] opacity-60">
-                                                    Buruk (0)
-                                                </span>
-                                                <span className="text-[#1a3129] opacity-60">
-                                                    Sangat Baik (100)
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Nutrients Section */}
-                                    <div>
-                                        <h3 className="text-lg font-bold text-[#1a3129] mb-4">
-                                            Informasi Nutrisi
-                                        </h3>
-                                        <div className="space-y-3">
-                                            {selectedProduct.nutrients &&
-                                            selectedProduct.nutrients.length >
-                                                0 ? (
-                                                selectedProduct.nutrients.map(
-                                                    (nutrient, idx) => (
-                                                        <div
-                                                            key={idx}
-                                                            className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-                                                            <div className="flex items-center justify-between">
-                                                                <span className="font-semibold text-[#1a3129]">
-                                                                    {
-                                                                        nutrient.nutrient_name
-                                                                    }
-                                                                </span>
-                                                                <span className="text-sm text-[#1a3129] opacity-70">
-                                                                    {
-                                                                        nutrient.amount
-                                                                    }
-                                                                    {
-                                                                        nutrient.unit
-                                                                    }
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    ),
-                                                )
-                                            ) : (
-                                                <p className="text-sm text-[#1a3129] opacity-60 text-center py-4">
-                                                    Tidak ada data nutrisi
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ProductDetailModal
+                selectedProduct={selectedProduct}
+                modalLoading={modalLoading}
+                modalError={modalError}
+                onClose={closeModal}
+            />
 
             <Footer />
         </div>
