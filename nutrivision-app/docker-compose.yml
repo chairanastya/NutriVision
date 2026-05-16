@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  # Next.js Application Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nutrivision-app
+    ports:
+      - "3000:3000"
+    environment:
+      # Database Connection (Neon)
+      DATABASE_URL: ${DATABASE_URL}
+
+      # Gemini AI
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL}
+
+      # Auth
+      AUTH_SECRET: ${AUTH_SECRET}
+
+      # Next.js Configuration
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+
+      # Google OAuth
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    volumes:
+      - ./public/uploads:/app/public/uploads
+
+    restart: unless-stopped

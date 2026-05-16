@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Camera } from "lucide-react";
+import Image from "next/image";
 import Footer from "@/components/Footer";
 import ProductDetailModal from "@/components/ProductDetailModal";
 
@@ -11,6 +12,7 @@ interface Scan {
     product_id: number;
     product_name: string;
     product_brand: string | null;
+    image_path: string | null;
     nutrition_score: number;
     scanned_at: string;
 }
@@ -35,7 +37,8 @@ export default function ScanHistory() {
     const [scans, setScans] = useState<Scan[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [selectedProduct, setSelectedProduct] = useState<ProductDetail | null>(null);
+    const [selectedProduct, setSelectedProduct] =
+        useState<ProductDetail | null>(null);
     const [modalLoading, setModalLoading] = useState(false);
     const [modalError, setModalError] = useState<string | null>(null);
 
@@ -88,14 +91,14 @@ export default function ScanHistory() {
             setModalError(null);
 
             const response = await fetch(
-                `/api/product-detail?productId=${scan.product_id}&scanId=${scan.id}`
+                `/api/product-detail?productId=${scan.product_id}&scanId=${scan.id}`,
             );
 
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(
                     errorData.error ||
-                        `Failed to fetch product details (${response.status})`
+                        `Failed to fetch product details (${response.status})`,
                 );
             }
 
@@ -186,7 +189,7 @@ export default function ScanHistory() {
                                             )}
                                             <p className="text-xs text-[#1a3129] opacity-50 mt-2">
                                                 {new Date(
-                                                    scan.scanned_at
+                                                    scan.scanned_at,
                                                 ).toLocaleDateString("id-ID", {
                                                     weekday: "short",
                                                     year: "numeric",
@@ -219,7 +222,7 @@ export default function ScanHistory() {
                                                 Score:{" "}
                                                 <span className="font-bold">
                                                     {Math.round(
-                                                        scan.nutrition_score
+                                                        scan.nutrition_score,
                                                     )}
                                                     /100
                                                 </span>
@@ -231,7 +234,10 @@ export default function ScanHistory() {
                         </div>
                     ) : (
                         <div className="text-center py-12">
-                            <Camera size={48} className="mx-auto text-gray-300 mb-4" />
+                            <Camera
+                                size={48}
+                                className="mx-auto text-gray-300 mb-4"
+                            />
                             <p className="text-[#1a3129] opacity-60 text-lg">
                                 Belum ada riwayat scan
                             </p>
