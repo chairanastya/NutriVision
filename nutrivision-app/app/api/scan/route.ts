@@ -94,6 +94,64 @@ function normalizeUnit(unit: string): string {
     return unit.trim().replace(/\s+/g, " ");
 }
 
+// Nutrient name mapping: Maps various nutrient name variations to correct database IDs
+// This ensures we're saving to the right nutrient regardless of naming variations in Gemini output
+const NUTRIENT_ID_MAPPING: Record<string, number> = {
+    // Energy/Calories → ID 9
+    energy: 9,
+    "energi": 9,
+    calorie: 9,
+    calories: 9,
+    kcal: 9,
+    kkal: 9,
+
+    // Protein → ID 2
+    protein: 2,
+
+    // Carbohydrates → ID 11
+    carbohydrate: 11,
+    carbohydrates: 11,
+    carbs: 11,
+    karbohidrat: 11,
+    "karbohidrat total": 11,
+
+    // Fat → ID 10
+    fat: 10,
+    lemak: 10,
+    "lemak total": 10,
+    lipid: 10,
+    lipids: 10,
+
+    // Sugar → ID 12
+    sugar: 12,
+    gula: 12,
+    sugars: 12,
+
+    // Sodium → ID 13
+    sodium: 13,
+    natrium: 13,
+    "natrium/sodium": 13,
+
+    // Fiber → ID 8
+    fiber: 8,
+    fibre: 8,
+    serat: 8,
+    "serat pangan": 8,
+    "dietary fiber": 8,
+
+    // Saturated Fat → ID 6
+    "saturated fat": 6,
+    "lemak jenuh": 6,
+};
+
+function getNutrientIdMapping(nutrientName: string): number | null {
+    const normalized = nutrientName
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ");
+    return NUTRIENT_ID_MAPPING[normalized] ?? null;
+}
+
 function pickImageExtension(params: {
     mimeType: string | null;
     fileName: string | null;
@@ -197,22 +255,28 @@ async function persistScanToDatabase(params: {
             const normalizedName = normalizeNutrientName(name);
             const normalizedUnit = normalizeUnit(unit);
 
-            const existing = await client.query(
-                `SELECT id, unit FROM nutrients WHERE lower(name) = lower($1) LIMIT 1`,
-                [normalizedName],
-            );
+            // First, try to find the nutrient from our mapping
+            let nutrientId = getNutrientIdMapping(normalizedName);
 
-            let nutrientId: number;
-            if (existing.rows.length > 0) {
-                nutrientId = Number(existing.rows[0].id);
-            } else {
-                const inserted = await client.query(
-                    `INSERT INTO nutrients (name, unit)
-                     VALUES ($1, $2)
-                     RETURNING id`,
-                    [normalizedName, normalizedUnit],
+            // If not found in mapping, query the database with case-insensitive match
+            if (nutrientId === null) {
+                const existing = await client.query(
+                    `SELECT id, unit FROM nutrients WHERE lower(name) = lower($1) LIMIT 1`,
+                    [normalizedName],
                 );
-                nutrientId = Number(inserted.rows[0]?.id);
+
+                if (existing.rows.length > 0) {
+                    nutrientId = Number(existing.rows[0].id);
+                } else {
+                    // Create new nutrient if it doesn't exist
+                    const inserted = await client.query(
+                        `INSERT INTO nutrients (name, unit)
+                         VALUES ($1, $2)
+                         RETURNING id`,
+                        [normalizedName, normalizedUnit],
+                    );
+                    nutrientId = Number(inserted.rows[0]?.id);
+                }
             }
 
             if (!Number.isInteger(nutrientId) || nutrientId <= 0) continue;

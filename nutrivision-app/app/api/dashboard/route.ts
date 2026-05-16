@@ -299,7 +299,7 @@ export async function GET(request: NextRequest) {
                     t.dailyLimit > 0,
             );
 
-        // 3. Fetch Today's Scans (get last 5 scans regardless of date for debugging)
+        // 3. Fetch All Scans (for display in scan history - all time)
         const scansResult = await queryDatabase(
             `SELECT 
                 s.id,
@@ -319,7 +319,7 @@ export async function GET(request: NextRequest) {
 
         const scans = scansResult.rows;
 
-        // 4. Calculate Daily Macronutrients (from the scans we just fetched)
+        // 4. Calculate Daily Macronutrients (from TODAY's scans only)
         const macronutrients: MacronutrientResponse = {
             protein: { name: "Protein", total: 0, unit: "g", limit: 80 },
             carbs: { name: "Karbohidrat", total: 0, unit: "g", limit: 250 },
@@ -327,35 +327,34 @@ export async function GET(request: NextRequest) {
             fiber: { name: "Serat", total: 0, unit: "g", limit: 25 },
         };
 
-        if (scans.length > 0) {
-            const macroResult = await queryDatabase(
-                `SELECT 
-                    n.name,
-                    n.unit,
-                    SUM(pn.amount) as total_amount
-                FROM scans s
-                JOIN product_nutrients pn ON s.product_id = pn.product_id
-                JOIN nutrients n ON pn.nutrient_id = n.id
-                WHERE s.user_id = $1 AND s.id IN (${scans.map((_, i) => `$${i + 2}`).join(",")})
-                GROUP BY n.id, n.name, n.unit`,
-                [userId, ...scans.map((s) => s.id)],
-            );
+        // Fetch macros only from TODAY's scans
+        const macroResult = await queryDatabase(
+            `SELECT 
+                n.name,
+                n.unit,
+                SUM(pn.amount) as total_amount
+            FROM scans s
+            JOIN product_nutrients pn ON s.product_id = pn.product_id
+            JOIN nutrients n ON pn.nutrient_id = n.id
+            WHERE s.user_id = $1 AND DATE(s.scanned_at) = CURRENT_DATE
+            GROUP BY n.id, n.name, n.unit`,
+            [userId],
+        );
 
-            (macroResult.rows as MacroRow[]).forEach((row) => {
-                const name = row.name.toLowerCase();
-                const amount = Math.round(toNumber(row.total_amount) * 10) / 10;
+        (macroResult.rows as MacroRow[]).forEach((row) => {
+            const name = row.name.toLowerCase();
+            const amount = Math.round(toNumber(row.total_amount) * 10) / 10;
 
-                if (name.includes("protein")) {
-                    macronutrients.protein.total = amount;
-                } else if (name.includes("carb")) {
-                    macronutrients.carbs.total = amount;
-                } else if (name.includes("fat") || name.includes("lipid")) {
-                    macronutrients.fat.total = amount;
-                } else if (name.includes("fiber") || name.includes("serat")) {
-                    macronutrients.fiber.total = amount;
-                }
-            });
-        }
+            if (name.includes("protein")) {
+                macronutrients.protein.total = amount;
+            } else if (name.includes("carb")) {
+                macronutrients.carbs.total = amount;
+            } else if (name.includes("fat") || name.includes("lipid")) {
+                macronutrients.fat.total = amount;
+            } else if (name.includes("fiber") || name.includes("serat")) {
+                macronutrients.fiber.total = amount;
+            }
+        });
 
         // 5. Calculate Total Calories (simplified: assuming ~4cal/g carbs, ~4cal/g protein, ~9cal/g fat)
         const total_calories = Math.round(
