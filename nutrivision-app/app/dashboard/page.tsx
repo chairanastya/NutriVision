@@ -865,30 +865,16 @@ export default function Dashboard() {
 
                     {/* Main Content Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[4fr_5fr_3fr] gap-6 md:gap-8 mb-8">
-                            {/* Left Column - Calorie Daily */}
-                            <div className="p-8 md:p-10 bg-lime-50 rounded-2xl outline-1 -outline-offset-1 outline-lime-200 flex flex-col gap-6 shadow-md hover:shadow-lg border border-lime-200/50 transition-shadow">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <span className="w-2 h-2 bg-green-600 rounded-full"></span>
-                                        <h3 className="font-bold text-[#1a3129] text-lg">
-                                            Kalori Harian
-                                        </h3>
-                                    </div>
-                                    <span className="text-xs text-gray-500 bg-white px-3 py-1 rounded-full">
-                                        {loading
-                                            ? "-"
-                                            : Math.round(
-                                                  (data?.healthProfile
-                                                      ?.daily_calories_target ||
-                                                      2000) -
-                                                      (data?.dailyStats
-                                                          ?.total_calories ||
-                                                          0),
-                                              )}{" "}
-                                        tersisa
-                                    </span>
+                        {/* Left Column - Calorie Daily */}
+                        <div className="p-8 md:p-10 bg-lime-50 rounded-2xl outline-1 -outline-offset-1 outline-lime-200 flex flex-col gap-6 shadow-md hover:shadow-lg border border-lime-200/50 transition-shadow">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-2 h-2 bg-green-600 rounded-full"></span>
+                                    <h3 className="font-bold text-[#1a3129] text-lg">
+                                        Kalori Harian
+                                    </h3>
                                 </div>
-                                <span className="text-xs text-gray-400">
+                                <span className="text-xs text-gray-500 bg-white px-3 py-1 rounded-full">
                                     {loading
                                         ? "-"
                                         : Math.round(
@@ -896,9 +882,10 @@ export default function Dashboard() {
                                                   ?.daily_calories_target ||
                                                   2000) -
                                                   (data?.dailyStats
-                                                      ?.total_calories || 0),
+                                                      ?.total_calories ||
+                                                      0),
                                           )}{" "}
-                                    kcal tersisa
+                                    tersisa
                                 </span>
                             </div>
 
@@ -1059,51 +1046,38 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                            {/* Middle Column - Riwayat Scan */}
-                            <ScanHistoryColumn
-                                scans={data?.scans}
-                                loading={loading}
-                                onScanClick={fetchProductDetail}
-                            />
+                        {/* Middle Column - Riwayat Scan */}
+                        <ScanHistoryColumn
+                            scans={data?.scans}
+                            loading={loading}
+                            onScanClick={fetchProductDetail}
+                        />
 
-                            {/* Right Column - Hidrasi, Energi & Mood, Aktivitas */}
-                            <div className="lg:col-span-1 space-y-6">
-                                {/* Nutri-Score 5-Day Trend */}
-                                {!loading &&
-                                    data?.nutriScoreTrend &&
-                                    data.nutriScoreTrend.length > 0 && (
-                                        <div className="p-8 md:p-10 bg-lime-50 rounded-2xl outline-1 -outline-offset-1 outline-lime-200 shadow-md hover:shadow-lg border border-lime-200/50 transition-shadow flex flex-col gap-6">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
-                                                    <h3 className="font-bold text-[#1a3129] text-lg">
-                                                        Nutri-Score 5 Hari
-                                                    </h3>
-                                                </div>
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-xs text-[#1a3129] opacity-70">
-                                                        Rata-rata:{" "}
-                                                        {Math.round(
-                                                            data.nutriScoreTrend.reduce(
-                                                                (sum, t) =>
-                                                                    sum +
-                                                                    t.score,
-                                                                0,
-                                                            ) /
-                                                                data
-                                                                    .nutriScoreTrend
-                                                                    .length,
-                                                        )}
-                                                    </span>
-                                                    {(() => {
-                                                        const avgScore =
-                                                            data.nutriScoreTrend.reduce(
-                                                                (sum, t) =>
-                                                                    sum +
-                                                                    t.score,
-                                                                0,
-                                                            ) /
-                                                            data.nutriScoreTrend
+                        {/* Right Column - Nutri-Score 5-Day Trend */}
+                        <div className="lg:col-span-1 space-y-6">
+                            {!loading &&
+                                data?.nutriScoreTrend &&
+                                data.nutriScoreTrend.length > 0 && (
+                                    <div className="p-8 md:p-10 bg-lime-50 rounded-2xl outline-1 -outline-offset-1 outline-lime-200 shadow-md hover:shadow-lg border border-lime-200/50 transition-shadow flex flex-col gap-6">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
+                                                <h3 className="font-bold text-[#1a3129] text-lg">
+                                                    Nutri-Score 5 Hari
+                                                </h3>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-xs text-[#1a3129] opacity-70">
+                                                    Rata-rata:{" "}
+                                                    {Math.round(
+                                                        data.nutriScoreTrend.reduce(
+                                                            (sum, t) =>
+                                                                sum +
+                                                                t.score,
+                                                            0,
+                                                        ) /
+                                                            data
+                                                                .nutriScoreTrend
                                                                 .length,
                                                     )}
                                                 </span>
@@ -1111,7 +1085,8 @@ export default function Dashboard() {
                                                     const avgScore =
                                                         data.nutriScoreTrend.reduce(
                                                             (sum, t) =>
-                                                                sum + t.score,
+                                                                sum +
+                                                                t.score,
                                                             0,
                                                         ) /
                                                         data.nutriScoreTrend
@@ -1121,9 +1096,11 @@ export default function Dashboard() {
                                                             ? "A"
                                                             : avgScore >= 60
                                                               ? "B"
-                                                              : avgScore >= 40
+                                                              : avgScore >=
+                                                                  40
                                                                 ? "C"
-                                                                : avgScore >= 20
+                                                                : avgScore >=
+                                                                    20
                                                                   ? "D"
                                                                   : "E";
                                                     const letterColor =
@@ -1131,9 +1108,11 @@ export default function Dashboard() {
                                                             ? "bg-green-600"
                                                             : avgScore >= 60
                                                               ? "bg-green-500"
-                                                              : avgScore >= 40
+                                                              : avgScore >=
+                                                                  40
                                                                 ? "bg-yellow-500"
-                                                                : avgScore >= 20
+                                                                : avgScore >=
+                                                                    20
                                                                   ? "bg-orange-500"
                                                                   : "bg-red-500";
                                                     return (
@@ -1146,10 +1125,8 @@ export default function Dashboard() {
                                             </div>
                                         </div>
 
-                                        {/* Dot Plot Chart */}
                                         {nutriScoreChart}
 
-                                        {/* Legend */}
                                         <div className="flex gap-3 mt-2 text-xs flex-wrap">
                                             <div className="flex items-center gap-1.5">
                                                 <div className="w-3 h-3 rounded-full bg-green-600"></div>
@@ -1182,8 +1159,15 @@ export default function Dashboard() {
                                                 </span>
                                             </div>
                                         </div>
-                                    )}
-                            </div>
+
+                                        <button
+                                            onClick={() => router.push("/nutri-score-details")}
+                                            className="w-full px-4 py-2.5 bg-[#2d6a3e] text-white rounded-lg text-sm font-semibold hover:bg-[#1a3129] transition-colors">
+                                            Lihat Detail
+                                        </button>
+                                    </div>
+                                )}
+                        </div>
                     </div>
                 </div>
             </div>
